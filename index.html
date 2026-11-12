@@ -168,5 +168,36 @@ nav{display:none}
 <p>GlobalMart marketplace preview. Accounts, orders, seller registration and payments are not active yet.</p>
 <p>© 2026 GlobalMart. All rights reserved.</p>
 </footer>
+  data: { business_name: business }
+    }
+  });
+
+  registerMessage.textContent = error
+    ? error.message
+    : "Registration successful! Please check your email to confirm your account.";
+});
+
+document.getElementById("login-button").addEventListener("click", async () => {
+  const email = document.getElementById("login-email").value.trim();
+  const password = document.getElementById("login-password").value;
+
+  loginMessage.textContent = "Signing in...";
+
+  const { error } = await db.auth.signInWithPassword({ email, password });
+
+  loginMessage.textContent = error ? error.message : "Welcome back! You are signed in.";
+  if (!error) logoutButton.hidden = false;
+});
+
+logoutButton.addEventListener("click", async () => {
+  const { error } = await db.auth.signOut();
+  loginMessage.textContent = error ? error.message : "You have logged out.";
+  if (!error) logoutButton.hidden = true;
+});
+
+db.auth.getSession().then(({ data }) => {
+  logoutButton.hidden = !data.session;
+});
+</script>
 </body>
 </html>

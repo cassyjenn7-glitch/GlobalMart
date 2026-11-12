@@ -41,7 +41,36 @@ h2{font:normal 38px Georgia,serif}
 .product h3{margin-bottom:5px}
 .muted{color:#aaa}
 .seller{background:#19150e;border-top:1px solid #66502a}
-footer{padding:35px 8%;border-top:1px solid #393020;color:#aaa;font-size:13px}
+.seller-form{
+  max-width:650px;
+  margin-top:28px;
+  display:grid;
+  gap:14px;
+}
+.seller-form label{
+  display:grid;
+  gap:6px;
+  color:#e8dfce;
+}
+.seller-form input,
+.seller-form textarea{
+  width:100%;
+  padding:12px;
+  background:#090909;
+  color:#fff;
+  border:1px solid #66502a;
+  border-radius:3px;
+  font:inherit;
+}
+.seller-form textarea{
+  min-height:120px;
+  resize:vertical;
+}
+.form-note{
+  font-size:13px;
+  color:#aaa;
+}
+  footer{padding:35px 8%;border-top:1px solid #393020;color:#aaa;font-size:13px}
 @media(max-width:700px){
 nav{display:none}
 .categories{grid-template-columns:repeat(2,1fr)}
@@ -94,7 +123,28 @@ nav{display:none}
 <p class="gold">SELL WITH GLOBALMART</p>
 <h2>Bring Your Business to the World.</h2>
 <p class="muted">We are building a marketplace for independent businesses and sellers to reach customers across Ghana, Africa and beyond.</p>
-<h3 class="gold">Seller registration coming soon.</h3>
+<h3 class="gold">Interested in selling with us?</h3>
+<p class="muted">Send us your details using our seller enquiry form.</p>
+<label>Business name
+    <input id="seller-business" name="business" type="text" required>
+  </label>
+
+  <label>Email address
+    <input id="seller-email" name="email" type="email" required>
+  </label>
+
+  <label>Phone or WhatsApp (optional)
+    <input id="seller-phone" name="phone" type="tel">
+  </label>
+
+  <label>What products would you like to sell?
+    <textarea id="seller-products" name="products" required></textarea>
+  </label>
+
+  <button class="btn" type="submit">Send seller enquiry</button>
+
+  <p class="form-note">Submitting opens your email app with your enquiry ready to send. This form does not store submissions online.</p>
+</form>
 </section>
 <section id="contact">
 <h2>Contact GlobalMart</h2>
@@ -108,5 +158,23 @@ nav{display:none}
 <p>GlobalMart marketplace preview. Accounts, orders, seller registration and payments are not active yet.</p>
 <p>© 2026 GlobalMart. All rights reserved.</p>
 </footer>
+<script>
+function sendSellerEnquiry(event){
+  event.preventDefault();
+
+  const fields = [
+    ["Name", document.getElementById("seller-name").value],
+    ["Business name", document.getElementById("seller-business").value],
+    ["Email", document.getElementById("seller-email").value],
+    ["Phone or WhatsApp", document.getElementById("seller-phone").value],
+    ["Products", document.getElementById("seller-products").value]
+  ];
+
+  const body = fields.map(([label,value]) => label + ": " + value).join("\n\n");
+  const subject = encodeURIComponent("GlobalMart seller enquiry");
+
+  window.location.href = "mailto:prosperfirm61@gmail.com?subject=" + subject + "&body=" + encodeURIComponent(body);
+}
+</script>
 </body>
 </html>

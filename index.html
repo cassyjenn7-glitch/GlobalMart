@@ -145,6 +145,46 @@ nav{display:none}
 
   <p class="form-note">Submitting opens your email app with your enquiry ready to send. This form does not store submissions online.</p>
 </form>
+<section class="seller" id="sellers">
+  <p class="gold">JOIN GLOBALMART</p>
+  <h2>Become a GlobalMart Seller</h2>
+  <p class="muted">Create your seller account and bring your products to customers across Ghana and beyond.</p>
+
+  <div class="seller-form">
+    <h3>Create your seller account</h3>
+
+    <label>Business name
+      <input id="register-business" type="text" required>
+    </label>
+
+    <label>Email address
+      <input id="register-email" type="email" required>
+    </label>
+
+    <label>Password
+      <input id="register-password" type="password" minlength="8" required>
+    </label>
+
+    <button class="btn" id="register-button" type="button">Register as a seller</button>
+    <p id="register-message" class="form-note"></p>
+  </div>
+
+  <div class="seller-form">
+    <h3>Already have an account?</h3>
+
+    <label>Email address
+      <input id="login-email" type="email" required>
+    </label>
+
+    <label>Password
+      <input id="login-password" type="password" required>
+    </label>
+
+    <button class="btn" id="login-button" type="button">Seller login</button>
+    <button class="btn outline" id="logout-button" type="button" hidden>Log out</button>
+    <p id="login-message" class="form-note"></p>
+  </div>
+</section>
 </section>
 <section id="contact">
 <h2>Contact GlobalMart</h2>

@@ -117,7 +117,27 @@ nav a{margin-left:8px}
 <p id="login-message" class="form-note"></p>
 </div>
 </section>
+ <label>Product description
+      <input id="product-description" type="text" required>
+    </label>
 
+    <label>Product price (GHS)
+      <input id="product-price" type="number" min="0.01" step="0.01" required>
+    </label>
+
+    <label>Product image URL (optional)
+      <input id="product-image" type="url">
+    </label>
+
+    <button class="btn" id="add-product-button" type="button">Submit Product</button>
+    <p id="product-message" class="form-note"></p>
+  </div>
+
+  <div class="seller-form">
+    <h3>My Products</h3>
+    <div id="my-products">Your products will appear here.</div>
+  </div>
+</section>
 <section id="contact">
 <h2>Contact GlobalMart</h2>
 <p>For customer enquiries, seller interest and business partnerships, contact us:</p>
@@ -193,6 +213,127 @@ logoutButton.addEventListener("click", async () => {
 db.auth.getSession().then(({ data }) => {
   logoutButton.hidden = !data.session;
 });
+  // Load the seller dashboard
+async function loadSellerDashboard(session) {
+  const dashboard = document.getElementById("seller-dashboard");
+
+  if (!session) {
+    dashboard.hidden = true;
+    return;
+  }
+
+  dashboard.hidden = false;
+
+  const user = session.user;
+
+  document.getElementById("dashboard-email").textContent =
+    "Email: " + user.email;
+
+  const { data: profile, error: profileError } = await db
+    .from("seller_profiles")
+    .select("business_name, contact_email")
+    .eq("user_id", user.id)
+    .single();
+
+  document.getElementById("dashboard-business").textContent =
+    profileError ? "Business profile could not be loaded." :
+    "Business: " + profile.business_name;
+
+  await loadMyProducts();
+}
+
+// Load products belonging to the signed-in seller
+async function loadMyProducts() {
+  const { data, error } = await db
+    .from("products")
+    .select("id, name, description, price, status")
+    .order("created_at", { ascending: false });
+
+  const container = document.getElementById("my-products");
+  container.innerHTML = "";
+
+  if (error) {
+    container.textContent = "Could not load products: " + error.message;
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    container.textContent = "You have not submitted any products yet.";
+    return;
+  }
+
+  data.forEach(product => {
+    const item = document.createElement("div");
+    item.className = "category";
+
+    const name = document.createElement("h3");
+    name.textContent = product.name;
+
+    const description = document.createElement("p");
+    description.textContent = product.description || "";
+
+    const price = document.createElement("p");
+    price.textContent = "Price: GHS " + Number(product.price).toFixed(2);
+
+    const status = document.createElement("p");
+    status.textContent = "Status: " + product.status;
+
+    item.append(name, description, price, status);
+    container.appendChild(item);
+  });
+}
+
+// Submit a new product
+document.getElementById("add-product-button")
+  .addEventListener("click", async () => {
+    const { data: { session } } = await db.auth.getSession();
+
+    if (!session) {
+      document.getElementById("product-message").textContent =
+        "Please log in first.";
+      return;
+    }
+
+    const name = document.getElementById("product-name").value.trim();
+    const description =
+      document.getElementById("product-description").value.trim();
+    const price = Number(
+      document.getElementById("product-price").value
+    );
+    const image = document.getElementById("product-image").value.trim();
+
+    const message = document.getElementById("product-message");
+
+    if (!name || !description || !Number.isFinite(price) || price <= 0) {
+      message.textContent = "Please enter a product name, description and valid price.";
+      return;
+    }
+
+    message.textContent = "Submitting your product...";
+
+    const { error } = await db.from("products").insert({
+      seller_id: session.user.id,
+      name: name,
+      description: description,
+      price: price,
+      image_url: image || null,
+      status: "pending"
+    });
+
+    if (error) {
+      message.textContent = "Error: " + error.message;
+      return;
+    }
+
+    message.textContent = "Product submitted successfully for approval!";
+
+    document.getElementById("product-name").value = "";
+    document.getElementById("product-description").value = "";
+    document.getElementById("product-price").value = "";
+    document.getElementById("product-image").value = "";
+
+    await loadMyProducts();
+  });
 </script>
 
 </body>

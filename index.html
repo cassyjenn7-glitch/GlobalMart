@@ -123,7 +123,6 @@ nav{display:none}
 <p class="gold">SELL WITH GLOBALMART</p>
 <h2>Bring Your Business to the World.</h2>
 <p class="muted">We are building a marketplace for independent businesses and sellers to reach customers across Ghana, Africa and beyond.</p>
-<h3 class="gold">Interested in selling with us?</h3>
 <p class="muted">Send us your details using our seller enquiry form.</p>
 <label>Business name
     <input id="seller-business" name="business" type="text" required>
@@ -144,7 +143,6 @@ nav{display:none}
   <button class="btn" type="submit">Send seller enquiry</button>
 
   <p class="form-note">Submitting opens your email app with your enquiry ready to send. This form does not store submissions online.</p>
-</form>
 <section class="seller" id="sellers">
   <p class="gold">JOIN GLOBALMART</p>
   <h2>Become a GlobalMart Seller</h2>
@@ -185,7 +183,6 @@ nav{display:none}
     <p id="login-message" class="form-note"></p>
   </div>
 </section>
-</section>
 <section id="contact">
 <h2>Contact GlobalMart</h2>
 <p>For customer enquiries, seller interest and business partnerships, contact us:</p>
@@ -198,23 +195,5 @@ nav{display:none}
 <p>GlobalMart marketplace preview. Accounts, orders, seller registration and payments are not active yet.</p>
 <p>© 2026 GlobalMart. All rights reserved.</p>
 </footer>
-<script>
-function sendSellerEnquiry(event){
-  event.preventDefault();
-
-  const fields = [
-    ["Name", document.getElementById("seller-name").value],
-    ["Business name", document.getElementById("seller-business").value],
-    ["Email", document.getElementById("seller-email").value],
-    ["Phone or WhatsApp", document.getElementById("seller-phone").value],
-    ["Products", document.getElementById("seller-products").value]
-  ];
-
-  const body = fields.map(([label,value]) => label + ": " + value).join("\n\n");
-  const subject = encodeURIComponent("GlobalMart seller enquiry");
-
-  window.location.href = "mailto:prosperfirm61@gmail.com?subject=" + subject + "&body=" + encodeURIComponent(body);
-}
-</script>
 </body>
 </html>

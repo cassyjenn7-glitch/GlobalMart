@@ -168,6 +168,17 @@ nav a{margin-left:8px}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+  // Connect the seller login to the dashboard
+db.auth.onAuthStateChange((event, session) => {
+  setTimeout(() => {
+    loadSellerDashboard(session);
+  }, 0);
+});
+
+// Load the dashboard if a seller is already signed in
+db.auth.getSession().then(({ data: { session } }) => {
+  loadSellerDashboard(session);
+});
 const SUPABASE_URL = "https://sjnjpqfyonjpndyffuli.supabase.co"
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_mkJRBRCS4XvHe9pYd_RA1g_xrZSyFid";
 

@@ -69,7 +69,67 @@ h2{font:normal 38px Georgia,serif}
 .form-note{
   font-size:13px;
   color:#aaa;
-}
+}<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = "https://sjnjpqfyonjpndyffuli.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "YOUR_REAL_PUBLISHABLE_KEY";
+
+const db = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
+
+const registerMessage = document.getElementById("register-message");
+const loginMessage = document.getElementById("login-message");
+const logoutButton = document.getElementById("logout-button");
+
+document.getElementById("register-button").addEventListener("click", async () => {
+  const business = document.getElementById("register-business").value.trim();
+  const email = document.getElementById("register-email").value.trim();
+  const password = document.getElementById("register-password").value;
+
+  if (!business || !email || password.length < 8) {
+    registerMessage.textContent = "Enter your business name, email and a password of at least 8 characters.";
+    return;
+  }
+
+  registerMessage.textContent = "Creating your account...";
+
+  const { error } = await db.auth.signUp({
+    email,
+    password,
+    options: {
+      data: { business_name: business }
+    }
+  });
+
+  registerMessage.textContent = error
+    ? error.message
+    : "Registration successful! Please check your email to confirm your account.";
+});
+
+document.getElementById("login-button").addEventListener("click", async () => {
+  const email = document.getElementById("login-email").value.trim();
+  const password = document.getElementById("login-password").value;
+
+  loginMessage.textContent = "Signing in...";
+
+  const { error } = await db.auth.signInWithPassword({ email, password });
+
+  loginMessage.textContent = error ? error.message : "Welcome back! You are signed in.";
+  if (!error) logoutButton.hidden = false;
+});
+
+logoutButton.addEventListener("click", async () => {
+  const { error } = await db.auth.signOut();
+  loginMessage.textContent = error ? error.message : "You have logged out.";
+  if (!error) logoutButton.hidden = true;
+});
+
+db.auth.getSession().then(({ data }) => {
+  logoutButton.hidden = !data.session;
+});
+</script>
   footer{padding:35px 8%;border-top:1px solid #393020;color:#aaa;font-size:13px}
 @media(max-width:700px){
 nav{display:none}
@@ -162,42 +222,7 @@ nav{display:none}
 <p><a href="mailto:prosperfirm61@gmail.com">Email GlobalMart</a></p>
 <p>prosperfirm61@gmail.com</p>
 </section>
-<footer>
-<div class="logo">GLOBAL<span>MART</span></div>
-<p>Your world. Your marketplace.</p>
-<p>GlobalMart marketplace preview. Accounts, orders, seller registration and payments are not active yet.</p>
-<p>© 2026 GlobalMart. All rights reserved.</p>
-</footer>
-  data: { business_name: business }
-    }
-  });
-
-  registerMessage.textContent = error
-    ? error.message
-    : "Registration successful! Please check your email to confirm your account.";
-});
-
-document.getElementById("login-button").addEventListener("click", async () => {
-  const email = document.getElementById("login-email").value.trim();
-  const password = document.getElementById("login-password").value;
-
-  loginMessage.textContent = "Signing in...";
-
-  const { error } = await db.auth.signInWithPassword({ email, password });
-
-  loginMessage.textContent = error ? error.message : "Welcome back! You are signed in.";
-  if (!error) logoutButton.hidden = false;
-});
-
-logoutButton.addEventListener("click", async () => {
-  const { error } = await db.auth.signOut();
-  loginMessage.textContent = error ? error.message : "You have logged out.";
-  if (!error) logoutButton.hidden = true;
-});
-
-db.auth.getSession().then(({ data }) => {
-  logoutButton.hidden = !data.session;
-});
-</script>
+sb_publishable_mkJRBRCS4XvHe9pYd_RA1g_xrZSyFid
+https://sjnjpqfyonjpndyffuli.supabase.co
 </body>
 </html>

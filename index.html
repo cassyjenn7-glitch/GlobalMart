@@ -310,7 +310,7 @@ async function loadPublicProducts() {
 
   const { data, error } = await db
     .from("products")
-.select("id, name, description, price, image_url, category")    
+    .select("id, name, description, price, image_url, category")
     .eq("status", "active")
     .order("created_at", { ascending: false });
 
@@ -326,7 +326,16 @@ async function loadPublicProducts() {
     return;
   }
 
-  data.forEach(product => {
+  const filteredProducts = selectedCategory
+    ? data.filter(product => product.category === selectedCategory)
+    : data;
+
+  if (filteredProducts.length === 0) {
+    container.textContent = "No products available in this category yet.";
+    return;
+  }
+
+  filteredProducts.forEach(product => {
     const card = document.createElement("div");
     card.className = "product";
 
@@ -339,9 +348,11 @@ async function loadPublicProducts() {
       image.style.objectFit = "cover";
       card.appendChild(image);
     }
-   const category = document.createElement("p");
-   category.className = "gold";
+
+    const category = document.createElement("p");
+    category.className = "gold";
     category.textContent = product.category || "Uncategorized";
+
     const name = document.createElement("h3");
     name.textContent = product.name;
 
@@ -355,22 +366,20 @@ async function loadPublicProducts() {
     details.className = "btn";
     details.textContent = "View Details";
 
-   
-details.addEventListener("click", () => {
-  const message = encodeURIComponent(
-    "Hello GlobalMart! I am interested in " + product.name +
-    ". Price: GHS " + Number(product.price).toFixed(2) +
-    ". Please provide more information."
-  );
+    details.addEventListener("click", () => {
+      const message = encodeURIComponent(
+        "Hello GlobalMart! I am interested in " + product.name +
+        ". Price: GHS " + Number(product.price).toFixed(2) +
+        ". Please provide more information."
+      );
 
-  window.open(
-    "https://wa.me/233209642135?text=" + message,
-    "_blank"
-  );
-});
+      window.open(
+        "https://wa.me/233209642135?text=" + message,
+        "_blank"
+      );
+    });
 
-
-   card.append(category, name, description, price, details);
+    card.append(category, name, description, price, details);
     container.appendChild(card);
   });
 }

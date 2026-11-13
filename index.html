@@ -165,17 +165,7 @@ nav a{margin-left:8px}
 <p>Marketplace preview. Product listings, orders and payments are not active yet.</p>
 <p>© 2026 GlobalMart. All rights reserved.</p>
 </footer>
-// Connect seller login to the dashboard
-db.auth.onAuthStateChange((event, session) => {
-  setTimeout(() => {
-    loadSellerDashboard(session);
-  }, 0);
-});
 
-// Load dashboard for an existing login
-db.auth.getSession().then(({ data: { session } }) => {
-  loadSellerDashboard(session);
-});
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
  
@@ -359,6 +349,16 @@ document.getElementById("add-product-button")
 
     await loadMyProducts();
   });
+  // Connect seller login to the dashboard
+db.auth.onAuthStateChange((event, session) => {
+  setTimeout(() => {
+    loadSellerDashboard(session);
+  }, 0);
+});
+
+db.auth.getSession().then(({ data: { session } }) => {
+  loadSellerDashboard(session);
+});
 </script>
 
 </body>

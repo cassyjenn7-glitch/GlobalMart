@@ -455,7 +455,8 @@ document.getElementById("add-product-button")
     const message = document.getElementById("product-message");
 
     if (!name || !description || !category || !Number.isFinite(price) || price <= 0) {
-      message.textContent = "Please enter a product name, description and valid price.";
+      message.textContent =
+        "Please enter a product name, description, category and valid price.";
       return;
     }
 
@@ -465,14 +466,10 @@ document.getElementById("add-product-button")
       seller_id: session.user.id,
       name: name,
       description: description,
-seller_id: session.user.id,
-name: name,
-description: description,
-price: price,
-image_url: image || null,
-category: category,
-status: "pending"
-});
+      price: price,
+      image_url: image || null,
+      category: category,
+      status: "pending"
     });
 
     if (error) {
@@ -486,10 +483,10 @@ status: "pending"
     document.getElementById("product-description").value = "";
     document.getElementById("product-price").value = "";
     document.getElementById("product-image").value = "";
+    document.getElementById("product-category").value = "";
 
     await loadMyProducts();
   });
-  // Load the secure GlobalMart Admin Dashboard
 async function loadAdminDashboard(session) {
   const dashboard = document.getElementById("admin-dashboard");
 

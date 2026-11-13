@@ -164,6 +164,16 @@ nav a{margin-left:8px}
     <label>Product price (GHS)
       <input id="product-price" type="number" min="0.01" step="0.01" required>
     </label>
+    <label>Product Category
+  <select id="product-category" required>
+    <option value="">Choose a category</option>
+    <option value="Fashion">Fashion</option>
+    <option value="Electronics">Electronics</option>
+    <option value="Beauty">Beauty</option>
+    <option value="Home Appliances">Home Appliances</option>
+    <option value="Groceries">Groceries</option>
+  </select>
+</label>
     <label>Product image URL (optional)
       <input id="product-image" type="url">
     </label>
@@ -422,10 +432,10 @@ document.getElementById("add-product-button")
       document.getElementById("product-price").value
     );
     const image = document.getElementById("product-image").value.trim();
-
+    const category = document.getElementById("product-category").value;
     const message = document.getElementById("product-message");
 
-    if (!name || !description || !Number.isFinite(price) || price <= 0) {
+    if (!name || !description || !category || !Number.isFinite(price) || price <= 0) {
       message.textContent = "Please enter a product name, description and valid price.";
       return;
     }
@@ -436,9 +446,14 @@ document.getElementById("add-product-button")
       seller_id: session.user.id,
       name: name,
       description: description,
-      price: price,
-      image_url: image || null,
-      status: "pending"
+seller_id: session.user.id,
+name: name,
+description: description,
+price: price,
+image_url: image || null,
+category: category,
+status: "pending"
+});
     });
 
     if (error) {

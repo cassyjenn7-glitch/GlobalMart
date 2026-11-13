@@ -795,27 +795,48 @@ db.auth.getSession().then(({ data: { session } }) => {
       chat.style.display === "block" ? "none" : "block";
   }
 
-  function sendAlexMessage() {
-    const input = document.getElementById("alex-input");
-    const messages = document.getElementById("alex-messages");
-    const question = input.value.trim();
 
-    if (!question) return;
+async function sendAlexMessage() {
+  const input = document.getElementById("alex-input");
+  const messages = document.getElementById("alex-messages");
+  const sendButton = document.getElementById("alex-send");
+  const question = input.value.trim();
 
-    const message = document.createElement("div");
-    message.className = "alex-message";
-    message.textContent = "You: " + question;
-    messages.appendChild(message);
+  if (!question) return;
 
-    const reply = document.createElement("div");
-    reply.className = "alex-message";
-    reply.textContent =
-      "Thank you for your message! Alex's AI connection is coming next.";
-    messages.appendChild(reply);
+  const userMessage = document.createElement("div");
+  userMessage.className = "alex-message";
+  userMessage.textContent = "You: " + question;
+  messages.appendChild(userMessage);
 
-    input.value = "";
+  input.value = "";
+  sendButton.disabled = true;
+  sendButton.textContent = "Thinking...";
+
+  const waiting = document.createElement("div");
+  waiting.className = "alex-message";
+  waiting.textContent = "Alex is thinking...";
+  messages.appendChild(waiting);
+  messages.scrollTop = messages.scrollHeight;
+
+  try {
+    const { data, error } = await db.functions.invoke("alex-chat", {
+      body: { message: question }
+    });
+
+    if (error) throw error;
+
+    waiting.textContent = "Alex: " + (data?.reply || "Sorry, I couldn't reply.");
+  } catch (error) {
+    console.error("Alex connection error:", error);
+    waiting.textContent = "Alex couldn't connect just now. Please try again.";
+  } finally {
+    sendButton.disabled = false;
+    sendButton.textContent = "Send";
     messages.scrollTop = messages.scrollHeight;
   }
+}
+
 </script>
 
 </body>

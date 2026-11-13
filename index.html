@@ -266,6 +266,7 @@ async function loadSellerDashboard(session) {
   await loadMyProducts();
 }
 // Load approved products for public customers
+// Load approved products for public customers
 async function loadPublicProducts() {
   const container = document.getElementById("public-products");
   container.textContent = "Loading approved products...";
@@ -311,12 +312,26 @@ async function loadPublicProducts() {
     const price = document.createElement("p");
     price.textContent = "Price: GHS " + Number(product.price).toFixed(2);
 
-    card.append(name, description, price);
+    const details = document.createElement("button");
+    details.className = "btn";
+    details.textContent = "View Details";
+
+    details.addEventListener("click", () => {
+      const subject = encodeURIComponent("Enquiry about " + product.name);
+      const body = encodeURIComponent(
+        "Hello GlobalMart,\n\nI am interested in: " + product.name +
+        "\nPrice: GHS " + Number(product.price).toFixed(2) +
+        "\n\nPlease provide more information about this product."
+      );
+
+      window.location.href =
+        "mailto:prosperfirm61@gmail.com?subject=" + subject + "&body=" + body;
+    });
+
+    card.append(name, description, price, details);
     container.appendChild(card);
   });
 }
-
-loadPublicProducts();
 // Load products belonging to the signed-in seller
 async function loadMyProducts() {
   const { data, error } = await db

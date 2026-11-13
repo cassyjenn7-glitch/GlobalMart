@@ -309,7 +309,7 @@ async function loadPublicProducts() {
 
   const { data, error } = await db
     .from("products")
-    .select("id, name, description, price, image_url")
+.select("id, name, description, price, image_url, category")    
     .eq("status", "active")
     .order("created_at", { ascending: false });
 
@@ -338,7 +338,9 @@ async function loadPublicProducts() {
       image.style.objectFit = "cover";
       card.appendChild(image);
     }
-
+   const category = document.createElement("p");
+   category.className = "gold";
+    category.textContent = product.category || "Uncategorized";
     const name = document.createElement("h3");
     name.textContent = product.name;
 
@@ -367,8 +369,7 @@ details.addEventListener("click", () => {
 });
 
 
-      
-    card.append(name, description, price, details);
+   card.append(category, name, description, price, details);
     container.appendChild(card);
   });
 }

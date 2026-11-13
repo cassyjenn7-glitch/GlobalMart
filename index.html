@@ -316,13 +316,20 @@ async function loadPublicProducts() {
     details.className = "btn";
     details.textContent = "View Details";
 
-    details.addEventListener("click", () => {
-      const subject = encodeURIComponent("Enquiry about " + product.name);
-      const body = encodeURIComponent(
-        "Hello GlobalMart,\n\nI am interested in: " + product.name +
-        "\nPrice: GHS " + Number(product.price).toFixed(2) +
-        "\n\nPlease provide more information about this product."
-      );
+   
+details.addEventListener("click", () => {
+  const message = encodeURIComponent(
+    "Hello GlobalMart! I am interested in " + product.name +
+    ". Price: GHS " + Number(product.price).toFixed(2) +
+    ". Please provide more information."
+  );
+
+  window.open(
+    "https://wa.me/233209642135?text=" + message,
+    "_blank"
+  );
+});
+
 
       window.location.href =
         "mailto:prosperfirm61@gmail.com?subject=" + subject + "&body=" + body;

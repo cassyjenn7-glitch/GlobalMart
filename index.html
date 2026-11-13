@@ -152,6 +152,17 @@ nav a{margin-left:8px}
     <div id="my-products">Your products will appear here.</div>
   </div>
 </section>
+ <section id="admin-dashboard" class="seller" hidden>
+  <p class="gold">ADMINISTRATION</p>
+  <h2>GlobalMart Admin Dashboard</h2>
+  <p>Welcome, Administrator.</p>
+
+  <h3>Registered Sellers</h3>
+  <div id="admin-sellers">Loading sellers...</div>
+
+  <h3>Submitted Products</h3>
+  <div id="admin-products">Loading products...</div>
+</section>
   <section id="contact">
 <h2>Contact GlobalMart</h2>
 <p>For customer enquiries, seller interest and business partnerships, contact us:</p>
@@ -349,11 +360,126 @@ document.getElementById("add-product-button")
 
     await loadMyProducts();
   });
-  // Connect seller login to the dashboard
+  // Load the secure GlobalMart Admin Dashboard
+async function loadAdminDashboard(session) {
+  const dashboard = document.getElementById("admin-dashboard");
+
+  if (!session) {
+    dashboard.hidden = true;
+    return;
+  }
+
+  const { data: admin, error: adminError } = await db
+    .from("admin_users")
+    .select("user_id")
+    .eq("user_id", session.user.id)
+    .maybeSingle();
+
+  if (adminError || !admin) {
+    dashboard.hidden = true;
+    return;
+  }
+
+  dashboard.hidden = false;
+
+  const sellersBox = document.getElementById("admin-sellers");
+  const productsBox = document.getElementById("admin-products");
+
+  sellersBox.textContent = "Loading sellers...";
+  productsBox.textContent = "Loading products...";
+
+  const { data: sellers, error: sellersError } = await db
+    .from("seller_profiles")
+    .select("business_name, contact_email, phone")
+    .order("created_at", { ascending: false });
+
+  sellersBox.replaceChildren();
+
+  if (sellersError) {
+    sellersBox.textContent = sellersError.message;
+  } else if (!sellers || sellers.length === 0) {
+    sellersBox.textContent = "No sellers registered yet.";
+  } else {
+    sellers.forEach(seller => {
+      const item = document.createElement("p");
+      item.textContent =
+        (seller.business_name || "Unnamed business") +
+        " — " + (seller.contact_email || "No email") +
+        " — " + (seller.phone || "No phone");
+      sellersBox.appendChild(item);
+    });
+  }
+
+  const { data: products, error: productsError } = await db
+    .from("products")
+    .select("id, name, description, price, status")
+    .order("created_at", { ascending: false });
+
+  productsBox.replaceChildren();
+
+  if (productsError) {
+    productsBox.textContent = productsError.message;
+    return;
+  }
+
+  if (!products || products.length === 0) {
+    productsBox.textContent = "No products submitted yet.";
+    return;
+  }
+
+  products.forEach(product => {
+    const item = document.createElement("div");
+    item.className = "category";
+
+    const details = document.createElement("p");
+    details.textContent =
+      product.name + " — GHS " +
+      Number(product.price).toFixed(2) +
+      " — Status: " + product.status;
+
+    item.appendChild(details);
+
+    if (product.status === "pending") {
+      ["active", "rejected"].forEach(status => {
+        const button = document.createElement("button");
+        button.textContent =
+          status === "active" ? "Approve" : "Reject";
+
+        button.addEventListener("click", async () => {
+          button.disabled = true;
+
+          const { error } = await db
+            .from("products")
+            .update({ status })
+            .eq("id", product.id);
+
+          if (error) {
+            alert("Update failed: " + error.message);
+            button.disabled = false;
+            return;
+          }
+
+          await loadAdminDashboard(session);
+        });
+
+        item.appendChild(button);
+      });
+    }
+
+    productsBox.appendChild(item);
+  });
+}
+ // Connect seller and admin dashboards to login
 db.auth.onAuthStateChange((event, session) => {
   setTimeout(() => {
     loadSellerDashboard(session);
+    loadAdminDashboard(session);
   }, 0);
+});
+
+db.auth.getSession().then(({ data: { session } }) => {
+  loadSellerDashboard(session);
+  loadAdminDashboard(session);
 });
 
 db.auth.getSession().then(({ data: { session } }) => {

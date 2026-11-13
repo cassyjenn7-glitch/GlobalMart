@@ -332,6 +332,7 @@ async function loadPublicProducts() {
     container.appendChild(card);
   });
 }
+  loadPublicProducts();
 // Load products belonging to the signed-in seller
 async function loadMyProducts() {
   const { data, error } = await db

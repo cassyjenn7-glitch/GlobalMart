@@ -165,20 +165,20 @@ nav a{margin-left:8px}
 <p>Marketplace preview. Product listings, orders and payments are not active yet.</p>
 <p>© 2026 GlobalMart. All rights reserved.</p>
 </footer>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-  // Connect the seller login to the dashboard
+// Connect seller login to the dashboard
 db.auth.onAuthStateChange((event, session) => {
   setTimeout(() => {
     loadSellerDashboard(session);
   }, 0);
 });
 
-// Load the dashboard if a seller is already signed in
+// Load dashboard for an existing login
 db.auth.getSession().then(({ data: { session } }) => {
   loadSellerDashboard(session);
 });
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+ 
 const SUPABASE_URL = "https://sjnjpqfyonjpndyffuli.supabase.co"
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_mkJRBRCS4XvHe9pYd_RA1g_xrZSyFid";
 

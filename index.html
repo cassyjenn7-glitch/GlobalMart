@@ -681,5 +681,143 @@ db.auth.getSession().then(({ data: { session } }) => {
 });
 </script>
 
+
+<!-- GLOBALMART ALEX AI CHAT ASSISTANT -->
+<style>
+  #alex-button {
+    position: fixed;
+    bottom: 22px;
+    right: 22px;
+    background: #d7b56d;
+    color: #111;
+    border: none;
+    border-radius: 50px;
+    padding: 15px 22px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 9999;
+  }
+
+  #alex-chat {
+    display: none;
+    position: fixed;
+    bottom: 85px;
+    right: 22px;
+    width: 320px;
+    max-width: calc(100vw - 44px);
+    height: 430px;
+    background: #151515;
+    color: white;
+    border: 1px solid #d7b56d;
+    border-radius: 14px;
+    overflow: hidden;
+    z-index: 9999;
+    box-shadow: 0 5px 25px #0008;
+  }
+
+  #alex-header {
+    background: #d7b56d;
+    color: #111;
+    padding: 16px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  #alex-messages {
+    height: 295px;
+    padding: 12px;
+    overflow-y: auto;
+  }
+
+  .alex-message {
+    background: #292929;
+    padding: 10px;
+    border-radius: 10px;
+    margin: 8px 0;
+    font-size: 14px;
+  }
+
+  #alex-controls {
+    display: flex;
+    padding: 10px;
+    gap: 6px;
+  }
+
+  #alex-input {
+    flex: 1;
+    min-width: 0;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #d7b56d;
+  }
+
+  #alex-send {
+    background: #d7b56d;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 6px;
+  }
+</style>
+
+<button id="alex-button" onclick="toggleAlex()">
+  🤖 Chat with Alex
+</button>
+
+<div id="alex-chat">
+  <div id="alex-header">
+    <span>🤖 Alex | GlobalMart AI</span>
+    <button onclick="toggleAlex()">✕</button>
+  </div>
+
+  <div id="alex-messages">
+    <div class="alex-message">
+      Hello! 👋 I'm Alex, your GlobalMart AI assistant.
+      How can I help you today?
+    </div>
+  </div>
+
+  <div id="alex-controls">
+    <input id="alex-input"
+      type="text"
+      placeholder="Ask Alex something..."
+    >
+    <button id="alex-send" onclick="sendAlexMessage()">
+      Send
+    </button>
+  </div>
+</div>
+
+<script>
+  function toggleAlex() {
+    const chat = document.getElementById("alex-chat");
+    chat.style.display =
+      chat.style.display === "block" ? "none" : "block";
+  }
+
+  function sendAlexMessage() {
+    const input = document.getElementById("alex-input");
+    const messages = document.getElementById("alex-messages");
+    const question = input.value.trim();
+
+    if (!question) return;
+
+    const message = document.createElement("div");
+    message.className = "alex-message";
+    message.textContent = "You: " + question;
+    messages.appendChild(message);
+
+    const reply = document.createElement("div");
+    reply.className = "alex-message";
+    reply.textContent =
+      "Thank you for your message! Alex's AI connection is coming next.";
+    messages.appendChild(reply);
+
+    input.value = "";
+    messages.scrollTop = messages.scrollHeight;
+  }
+</script>
+
 </body>
 </html>

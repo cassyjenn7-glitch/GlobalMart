@@ -67,32 +67,32 @@ nav a{margin-left:8px}
   <h2>Shop by Category</h2>
 
   <div class="categories">
-    <div class="category">
-      <div class="symbol">✦</div>
+<div class="category" data-category="Fashion" role="button" tabindex="0">
+    <div class="symbol">✦</div>
       <h3>Fashion</h3>
       <p class="muted">Clothing, shoes and accessories</p>
     </div>
 
-    <div class="category">
-      <div class="symbol">⌁</div>
+<div class="category" data-category="Electronics" role="button" tabindex="0">
+    <div class="symbol">⌁</div>
       <h3>Electronics</h3>
       <p class="muted">Phones, computers and technology</p>
     </div>
 
-    <div class="category">
+    <div class="category" data-category="Beauty" role="button" tabindex="0">
       <div class="symbol">❀</div>
       <h3>Beauty</h3>
       <p class="muted">Beauty, skincare and personal care</p>
     </div>
 
-    <div class="category">
-      <div class="symbol">⌂</div>
+<div class="category" data-category="Home Appliances" role="button" tabindex="0">
+    <div class="symbol">⌂</div>
       <h3>Home Appliances</h3>
       <p class="muted">Appliances and home essentials</p>
     </div>
 
-    <div class="category">
-      <div class="symbol">❖</div>
+<div class="category" data-category="Groceries" role="button" tabindex="0">
+    <div class="symbol">❖</div>
       <h3>Groceries</h3>
       <p class="muted">Food and everyday essentials</p>
     </div>
@@ -303,6 +303,7 @@ async function loadSellerDashboard(session) {
 }
 // Load approved products for public customers
 // Load approved products for public customers
+  let selectedCategory = "";
 async function loadPublicProducts() {
   const container = document.getElementById("public-products");
   container.textContent = "Loading approved products...";
@@ -394,8 +395,16 @@ async function loadMyProducts() {
     return;
   }
 
-  data.forEach(product => {
-    const item = document.createElement("div");
+const filteredProducts = selectedCategory
+  ? data.filter(product => product.category === selectedCategory)
+  : data;
+
+filteredProducts.forEach(product => {
+  if (filteredProducts.length === 0) {
+  container.textContent = "No products available in this category yet.";
+  return;
+}
+  const item = document.createElement("div");
     item.className = "category";
 
     const name = document.createElement("h3");

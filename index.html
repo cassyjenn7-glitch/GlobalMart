@@ -392,7 +392,7 @@ async function loadMyProducts() {
     .order("created_at", { ascending: false });
 
   const container = document.getElementById("my-products");
-  container.innerHTML = "";
+  container.replaceChildren();
 
   if (error) {
     container.textContent = "Could not load products: " + error.message;
@@ -404,16 +404,8 @@ async function loadMyProducts() {
     return;
   }
 
-const filteredProducts = selectedCategory
-  ? data.filter(product => product.category === selectedCategory)
-  : data;
-
-filteredProducts.forEach(product => {
-  if (filteredProducts.length === 0) {
-  container.textContent = "No products available in this category yet.";
-  return;
-}
-  const item = document.createElement("div");
+  data.forEach(product => {
+    const item = document.createElement("div");
     item.className = "category";
 
     const name = document.createElement("h3");
@@ -432,8 +424,6 @@ filteredProducts.forEach(product => {
     container.appendChild(item);
   });
 }
-
-// Submit a new product
 document.getElementById("add-product-button")
   .addEventListener("click", async () => {
     const { data: { session } } = await db.auth.getSession();

@@ -133,7 +133,30 @@ nav a{margin-left:8px}
  <div id="cart-items"></div>
 <h3 id="cart-total">Total: GHS 0.00</h3>
 </div>
+<div class="filter-section">
+  <label for="customer-country">Choose your country:</label>
+  <select id="customer-country">
+    <option value="">Choose your country</option>
+    <option value="Ghana">Ghana</option>
+    <option value="Nigeria">Nigeria</option>
+    <option value="South Africa">South Africa</option>
+    <option value="Kenya">Kenya</option>
+    <option value="United Kingdom">United Kingdom</option>
+    <option value="United States">United States</option>
+    <option value="Canada">Canada</option>
+    <option value="China">China</option>
+    <option value="India">India</option>
+    <option value="United Arab Emirates">United Arab Emirates</option>
+    <option value="Other">Other</option>
+  </select>
 
+  <label for="country-filter">Show products:</label>
+  <select id="country-filter">
+    <option value="all">All Countries</option>
+    <option value="local">My Country</option>
+    <option value="international">Other Countries</option>
+  </select>
+</div>
 <div id="public-products" class="products">
   Loading approved products...
 </div>
@@ -493,12 +516,29 @@ document.querySelectorAll(".category[data-category]").forEach(category => {
     return;
   }
 
-const filteredProducts = selectedCategory
-  ? data.filter(product =>
-      (product.category || "").trim().toLowerCase() ===
-      selectedCategory.trim().toLowerCase()
-    )
-  : data;
+const customerCountry = document.getElementById("customer-country").value;
+const countryFilter = document.getElementById("country-filter").value;
+
+const filteredProducts = data.filter(product => {
+  const matchesCategory = !selectedCategory ||
+    (product.category || "").trim().toLowerCase() ===
+    selectedCategory.trim().toLowerCase();
+
+  const productCountry = (product.country_of_origin || "").trim().toLowerCase();
+  const selectedCountry = customerCountry.trim().toLowerCase();
+
+  const matchesCountry =
+    countryFilter === "all" ||
+    (countryFilter === "local" &&
+      selectedCountry !== "" &&
+      productCountry === selectedCountry) ||
+    (countryFilter === "international" &&
+      selectedCountry !== "" &&
+      productCountry !== "" &&
+      productCountry !== selectedCountry);
+
+  return matchesCategory && matchesCountry;
+});
 
   if (filteredProducts.length === 0) {
     container.textContent = "No products available in this category yet.";
@@ -564,6 +604,11 @@ card.append(category, name, description, price, country, details, addButton);   
   });
 
 }
+  document.getElementById("customer-country")
+  .addEventListener("change", loadPublicProducts);
+
+document.getElementById("country-filter")
+  .addEventListener("change", loadPublicProducts);
   loadPublicProducts();
 // Load products belonging to the signed-in seller
 async function loadMyProducts() {

@@ -152,6 +152,22 @@ nav a{margin-left:8px}
 <input id="register-business" type="text" required>
 </label>
 <label>Email address
+  <label>Business country
+  <select id="register-country" required>
+    <option value="">Choose your country</option>
+    <option value="Ghana">Ghana</option>
+    <option value="Nigeria">Nigeria</option>
+    <option value="South Africa">South Africa</option>
+    <option value="Kenya">Kenya</option>
+    <option value="United Kingdom">United Kingdom</option>
+    <option value="United States">United States</option>
+    <option value="Canada">Canada</option>
+    <option value="China">China</option>
+    <option value="India">India</option>
+    <option value="United Arab Emirates">United Arab Emirates</option>
+    <option value="Other">Other</option>
+  </select>
+</label>
 <input id="register-email" type="email" required>
 </label>
 <label>Password (at least 8 characters)
@@ -266,13 +282,26 @@ const logoutButton = document.getElementById("logout-button");
 
 document.getElementById("register-button").addEventListener("click", async () => {
   const business = document.getElementById("register-business").value.trim();
+  const country = document.getElementById("register-country").value;
+const storeAddress = document.getElementById("register-store-address").value.trim();
   const email = document.getElementById("register-email").value.trim();
   const password = document.getElementById("register-password").value;
 
-  if (!business || !email || password.length < 8) {
-    registerMessage.textContent = "Enter your business name, email and a password of at least 8 characters.";
-    return;
-  }
+if (!business || !country || !storeAddress || !email || password.length < 8) {
+  registerMessage.textContent = "Enter your business name, country, store address, email and a password of at least 8 characters.";
+  return;
+}
+  <label>Store address
+  <input
+    id="register-store-address"
+    type="text"
+    placeholder="Street, area and city"
+    required
+  >
+</label>
+  registerMessage.textContent = "Enter your business name, country, email and a password of at least 8 characters.";
+  return;
+}
 
   registerMessage.textContent = "Creating your account...";
 
@@ -280,7 +309,12 @@ document.getElementById("register-button").addEventListener("click", async () =>
     email,
     password,
     options: {
-      data: { business_name: business }
+
+    data: {
+  business_name: business,
+  country: country,
+  store_address: storeAddress
+}
     }
   });
 

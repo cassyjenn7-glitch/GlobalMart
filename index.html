@@ -227,6 +227,22 @@ nav a{margin-left:8px}
     
   </select>
 </label>
+    <label>Product country
+  <select id="product-country" required>
+    <option value="">Choose country of origin</option>
+    <option value="Ghana">Ghana</option>
+    <option value="Nigeria">Nigeria</option>
+    <option value="South Africa">South Africa</option>
+    <option value="Kenya">Kenya</option>
+    <option value="United Kingdom">United Kingdom</option>
+    <option value="United States">United States</option>
+    <option value="Canada">Canada</option>
+    <option value="China">China</option>
+    <option value="India">India</option>
+    <option value="United Arab Emirates">United Arab Emirates</option>
+    <option value="Other">Other</option>
+  </select>
+</label>
     <label>Product image URL (optional)
       <input id="product-image" type="url">
     </label>
@@ -461,7 +477,7 @@ document.querySelectorAll(".category[data-category]").forEach(category => {
 
   const { data, error } = await db
     .from("products")
-    .select("id, name, description, price, image_url, category")
+.select("id, name, description, price, image_url, category, country_of_origin")
     .eq("status", "active")
     .order("created_at", { ascending: false });
 
@@ -515,10 +531,13 @@ const filteredProducts = selectedCategory
 
     const price = document.createElement("p");
     price.textContent = "Price: GHS " + Number(product.price).toFixed(2);
+    const country = document.createElement("p");
+country.textContent = "Ships from: " + (product.country_of_origin || "Country not specified");
 
     const details = document.createElement("button");
     details.className = "btn";
     details.textContent = "View Details";
+    
 
     details.addEventListener("click", () => {
       const message = encodeURIComponent(
@@ -541,8 +560,7 @@ addButton.addEventListener("click", () => {
   addToCart(product);
 });
 
-card.append(category, name, description, price, details, addButton);
-    container.appendChild(card);
+card.append(category, name, description, price, country, details, addButton);    container.appendChild(card);
   });
 
 }
@@ -614,16 +632,7 @@ document.getElementById("add-product-button")
 
     message.textContent = "Submitting your product...";
 
-    const { error } = await db.from("products").insert({
-      seller_id: session.user.id,
-      name: name,
-      description: description,
-      price: price,
-      image_url: image || null,
-      category: category,
-      status: "pending"
-    });
-
+   country_of_origin: document.getElementById("product-country").value,
     if (error) {
       message.textContent = "Error: " + error.message;
       return;

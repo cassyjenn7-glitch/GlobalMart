@@ -443,8 +443,11 @@ document.querySelectorAll(".category[data-category]").forEach(category => {
     return;
   }
 
-  const filteredProducts = selectedCategory
-    ? data.filter(product => product.category === selectedCategory)
+const filteredProducts = selectedCategory
+  ? data.filter(product =>
+      (product.category || "").trim().toLowerCase() === selectedCategory.trim().toLowerCase()
+    )
+  : data;    ? data.filter(product => product.category === selectedCategory)
     : data;
 
   if (filteredProducts.length === 0) {

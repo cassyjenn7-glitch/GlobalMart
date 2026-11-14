@@ -210,7 +210,76 @@ nav a{margin-left:8px}
 <p id="login-message" class="form-note"></p>
 </div>
 </section>
+<section id="customers" class="seller">
+  <p class="gold">SHOP WITH GLOBALMART</p>
+  <h2>Customer Account</h2>
+  <p>Create an account to manage your purchases and track your orders.</p>
 
+  <div class="seller-form">
+    <h3>Create a customer account</h3>
+
+    <label>Full name
+      <input id="customer-name" type="text" required>
+    </label>
+
+    <label>Phone number
+      <input id="customer-phone" type="tel" required>
+    </label>
+
+    <label>Country
+      <input id="customer-country" type="text" value="Ghana" required>
+    </label>
+
+    <label>Delivery address
+      <input id="customer-address" type="text" required>
+    </label>
+
+    <label>Email address
+      <input id="customer-register-email" type="email" required>
+    </label>
+
+    <label>Password (at least 8 characters)
+      <input id="customer-register-password" type="password" minlength="8" required>
+    </label>
+
+    <button class="btn" id="customer-register-button" type="button">
+      Create Customer Account
+    </button>
+
+    <p id="customer-register-message" class="form-note"></p>
+  </div>
+
+  <div class="seller-form">
+    <h3>Already have a customer account?</h3>
+
+    <label>Email address
+      <input id="customer-login-email" type="email" required>
+    </label>
+
+    <label>Password
+      <input id="customer-login-password" type="password" required>
+    </label>
+
+    <button class="btn" id="customer-login-button" type="button">
+      Customer Login
+    </button>
+
+    <button class="btn outline" id="customer-logout-button" type="button" hidden>
+      Log Out
+    </button>
+
+    <p id="customer-login-message" class="form-note"></p>
+  </div>
+
+  <div id="customer-dashboard" class="seller-form" hidden>
+    <h3>My Customer Account</h3>
+    <p id="customer-dashboard-name"></p>
+    <h3>My Orders</h3>
+    <div id="customer-orders">
+      Your orders will appear here.
+    </div>
+  </div>
+</section>
 <section id="seller-dashboard" class="seller" hidden>
   <p class="gold">SELLER CENTRE</p>
   <h2>My Seller Dashboard</h2>
@@ -370,6 +439,198 @@ logoutButton.addEventListener("click", async () => {
 db.auth.getSession().then(({ data }) => {
   logoutButton.hidden = !data.session;
 });
+  // GLOBALMART CUSTOMER REGISTRATION AND LOGIN
+
+const customerRegisterMessage =
+  document.getElementById("customer-register-message");
+
+const customerLoginMessage =
+  document.getElementById("customer-login-message");
+
+const customerLogoutButton =
+  document.getElementById("customer-logout-button");
+
+document.getElementById("customer-register-button")
+  .addEventListener("click", async () => {
+
+    const fullName =
+      document.getElementById("customer-name").value.trim();
+
+    const phone =
+      document.getElementById("customer-phone").value.trim();
+
+    const country =
+      document.getElementById("customer-country").value.trim();
+
+    const address =
+      document.getElementById("customer-address").value.trim();
+
+    const email =
+      document.getElementById("customer-register-email").value.trim();
+
+    const password =
+      document.getElementById("customer-register-password").value;
+
+    if (!fullName || !phone || !country || !address ||
+        !email || password.length < 8) {
+      customerRegisterMessage.textContent =
+        "Please complete all fields and use a password of at least 8 characters.";
+      return;
+    }
+
+    customerRegisterMessage.textContent =
+      "Creating your customer account...";
+
+    const { error } = await db.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          account_type: "customer",
+          full_name: fullName,
+          phone,
+          country,
+          delivery_address: address
+        }
+      }
+    });
+
+    customerRegisterMessage.textContent = error
+      ? error.message
+      : "Registration successful! Please check your email to confirm your account, then log in.";
+  });
+
+async function loadCustomerDashboard(session) {
+  const dashboard =
+    document.getElementById("customer-dashboard");
+
+  if (!session ||
+      session.user.user_metadata.account_type !== "customer") {
+    dashboard.hidden = true;
+    return;
+  }
+
+  const user = session.user;
+  const details = user.user_metadata;
+
+  const { error: profileError } = await db
+    .from("customer_profiles")
+    .upsert({
+      user_id: user.id,
+      full_name: details.full_name || "",
+      phone: details.phone || "",
+      country: details.country || "Ghana",
+      delivery_address: details.delivery_address || ""
+    }, { onConflict: "user_id" });
+
+  if (profileError) {
+    customerLoginMessage.textContent =
+      "Your account is signed in, but your profile could not be loaded: " +
+      profileError.message;
+    return;
+  }
+
+  dashboard.hidden = false;
+
+  document.getElementById("customer-dashboard-name").textContent =
+    "Welcome, " + (details.full_name || user.email);
+
+  const ordersBox = document.getElementById("customer-orders");
+  ordersBox.textContent = "Loading your orders...";
+
+  const { data: orders, error: ordersError } = await db
+    .from("orders")
+    .select("*")
+    .eq("customer_id", user.id)
+    .order("created_at", { ascending: false });
+
+  if (ordersError) {
+    ordersBox.textContent =
+      "Your orders could not be loaded.";
+    return;
+  }
+
+  if (!orders || orders.length === 0) {
+    ordersBox.textContent =
+      "You have no orders yet. Your purchases will appear here.";
+    return;
+  }
+
+  ordersBox.replaceChildren();
+
+  orders.forEach(order => {
+    const item = document.createElement("div");
+    item.className = "seller-form";
+
+    const heading = document.createElement("h4");
+    heading.textContent = "Order: " + order.id;
+
+    const status = document.createElement("p");
+    status.textContent =
+      "Order status: " + order.order_status +
+      " | Delivery: " + order.delivery_status;
+
+    const payment = document.createElement("p");
+    payment.textContent =
+      "Payment status: " + order.payment_status;
+
+    const total = document.createElement("p");
+    total.textContent =
+      "Total: " + order.currency + " " +
+      Number(order.total_amount).toFixed(2);
+
+    item.append(heading, status, payment, total);
+    ordersBox.appendChild(item);
+  });
+}
+
+document.getElementById("customer-login-button")
+  .addEventListener("click", async () => {
+
+    const email =
+      document.getElementById("customer-login-email").value.trim();
+
+    const password =
+      document.getElementById("customer-login-password").value;
+
+    customerLoginMessage.textContent = "Signing in...";
+
+    const { data, error } = await db.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) {
+      customerLoginMessage.textContent = error.message;
+      return;
+    }
+
+    if (data.user.user_metadata.account_type !== "customer") {
+      await db.auth.signOut();
+      customerLoginMessage.textContent =
+        "This is not a customer account. Please use the correct account login.";
+      return;
+    }
+
+    customerLoginMessage.textContent =
+      "Welcome back! You are signed in.";
+
+    customerLogoutButton.hidden = false;
+
+    await loadCustomerDashboard(data.session);
+  });
+
+customerLogoutButton.addEventListener("click", async () => {
+  const { error } = await db.auth.signOut();
+
+  customerLoginMessage.textContent = error
+    ? error.message
+    : "You have logged out.";
+
+  customerLogoutButton.hidden = true;
+
+  document.getElementById("customer-dashboard").hidden = true;
+});
   // Load the seller dashboard
 async function loadSellerDashboard(session) {
   const dashboard = document.getElementById("seller-dashboard");
@@ -379,21 +640,25 @@ async function loadSellerDashboard(session) {
     return;
   }
 
-  dashboard.hidden = false;
-
   const user = session.user;
+
+  const { data: profile, error } = await db
+    .from("seller_profiles")
+    .select("business_name, contact_email")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (error || !profile) {
+    dashboard.hidden = true;
+    return;
+  }
+
+  dashboard.hidden = false;
 
   document.getElementById("dashboard-email").textContent =
     "Email: " + user.email;
 
-  const { data: profile, error: profileError } = await db
-    .from("seller_profiles")
-    .select("business_name, contact_email")
-    .eq("user_id", user.id)
-    .single();
-
   document.getElementById("dashboard-business").textContent =
-    profileError ? "Business profile could not be loaded." :
     "Business: " + profile.business_name;
 
   await loadMyProducts();
@@ -797,23 +1062,20 @@ async function loadAdminDashboard(session) {
     productsBox.appendChild(item);
   });
 }
- // Connect seller and admin dashboards to login
+// Connect customer, seller and admin dashboards to login
 db.auth.onAuthStateChange((event, session) => {
   setTimeout(() => {
     loadSellerDashboard(session);
+    loadCustomerDashboard(session);
     loadAdminDashboard(session);
   }, 0);
 });
 
 db.auth.getSession().then(({ data: { session } }) => {
   loadSellerDashboard(session);
+  loadCustomerDashboard(session);
   loadAdminDashboard(session);
 });
-
-db.auth.getSession().then(({ data: { session } }) => {
-  loadSellerDashboard(session);
-});
-</script>
 
 
 <!-- GLOBALMART ALEX AI CHAT ASSISTANT -->

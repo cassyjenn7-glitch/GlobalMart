@@ -404,7 +404,26 @@ function addToCart(product) {
 
   updateCart();
 }
-async function loadPublicProducts() {
+// Make all GlobalMart categories clickable
+document.querySelectorAll(".category[data-category]").forEach(category => {
+  const selectCategory = () => {
+    selectedCategory = category.dataset.category;
+    loadPublicProducts();
+    document.getElementById("products").scrollIntoView({
+      behavior: "smooth"
+    });
+  };
+
+  category.addEventListener("click", selectCategory);
+
+  category.addEventListener("keydown", event => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      selectCategory();
+    }
+  });
+});
+  async function loadPublicProducts() {
   const container = document.getElementById("public-products");
   container.textContent = "Loading approved products...";
 

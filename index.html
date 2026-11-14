@@ -667,7 +667,16 @@ document.getElementById("add-product-button")
 
     message.textContent = "Submitting your product...";
 
-   country_of_origin: document.getElementById("product-country").value,
+    const { error } = await db.from("products").insert({
+  seller_id: session.user.id,
+  name: name,
+  description: description,
+  price: price,
+  image_url: image || null,
+  category: category,
+  country_of_origin: document.getElementById("product-country").value,
+  status: "pending"
+});
     if (error) {
       message.textContent = "Error: " + error.message;
       return;

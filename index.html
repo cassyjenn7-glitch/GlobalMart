@@ -445,10 +445,10 @@ document.querySelectorAll(".category[data-category]").forEach(category => {
 
 const filteredProducts = selectedCategory
   ? data.filter(product =>
-      (product.category || "").trim().toLowerCase() === selectedCategory.trim().toLowerCase()
+      (product.category || "").trim().toLowerCase() ===
+      selectedCategory.trim().toLowerCase()
     )
-  : data;    ? data.filter(product => product.category === selectedCategory)
-    : data;
+  : data;
 
   if (filteredProducts.length === 0) {
     container.textContent = "No products available in this category yet.";

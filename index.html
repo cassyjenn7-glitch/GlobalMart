@@ -501,37 +501,58 @@ async function loadCustomerDashboard(session) {
   const dashboard =
     document.getElementById("customer-dashboard");
 
-  if (!session ||
-      session.user.user_metadata.account_type !== "customer") {
-    dashboard.hidden = true;
-    return;
-  }
+ if (!session) {
+  dashboard.hidden = true;
+  return;
+}
 
   const user = session.user;
   const details = user.user_metadata;
 
-  const { error: profileError } = await db
-    .from("customer_profiles")
-    .upsert({
-      user_id: user.id,
-      full_name: details.full_name || "",
-      phone: details.phone || "",
-      country: details.country || "Ghana",
-      delivery_address: details.delivery_address || ""
-    }, { onConflict: "user_id" });
+ const { data: existingProfile, error: lookupError } = await db
+  .from("customer_profiles")
+  .select("user_id, full_name, phone, country, delivery_address")
+  .eq("user_id", user.id)
+  .maybeSingle();
 
-  if (profileError) {
+if (lookupError) {
+  customerLoginMessage.textContent =
+    "Your account is signed in, but your profile could not be loaded: " +
+    lookupError.message;
+  dashboard.hidden = true;
+  return;
+}
+
+let customerProfile = existingProfile;
+
+if (!customerProfile) {
+  const { data: createdProfile, error: createError } = await db
+    .from("customer_profiles")
+    .insert({
+      user_id: user.id,
+      full_name: details.full_name || details.business_name || null,
+      phone: details.phone || null,
+      country: details.country || "Ghana",
+      delivery_address: details.delivery_address || details.store_address || null
+    })
+    .select("user_id, full_name, phone, country, delivery_address")
+    .single();
+
+  if (createError) {
     customerLoginMessage.textContent =
-      "Your account is signed in, but your profile could not be loaded: " +
-      profileError.message;
+      "Your account is signed in, but your customer profile could not be created: " +
+      createError.message;
+    dashboard.hidden = true;
     return;
   }
+
+  customerProfile = createdProfile;
+}
 
   dashboard.hidden = false;
 
   document.getElementById("customer-dashboard-name").textContent =
-    "Welcome, " + (details.full_name || user.email);
-
+"Welcome, " + (customerProfile.full_name || user.email);
   const ordersBox = document.getElementById("customer-orders");
   ordersBox.textContent = "Loading your orders...";
 
@@ -602,12 +623,8 @@ document.getElementById("customer-login-button")
       return;
     }
 
-    if (data.user.user_metadata.account_type !== "customer") {
-      await db.auth.signOut();
-      customerLoginMessage.textContent =
-        "This is not a customer account. Please use the correct account login.";
-      return;
-    }
+    customerLoginMessage.textContent =
+  "Welcome back! You are signed in to your GlobalMart account.";
 
     customerLoginMessage.textContent =
       "Welcome back! You are signed in.";

@@ -134,8 +134,7 @@ nav a{margin-left:8px}
 <h3 id="cart-total">Total: GHS 0.00</h3>
 </div>
 <div class="filter-section">
-  <label for="customer-country">Choose your country:</label>
-  <select id="customer-country">
+<label for="market-country-filter">Choose your country:</label>  <selectid="market-country-filter"
     <option value="">Choose your country</option>
     <option value="Ghana">Ghana</option>
     <option value="Nigeria">Nigeria</option>
@@ -460,9 +459,7 @@ document.getElementById("customer-register-button")
       document.getElementById("customer-phone").value.trim();
 
     const country =
-      document.getElementById("customer-country").value.trim();
-
-    const address =
+  document.getElementById("customer-country").value.trim();    const address =
       document.getElementById("customer-address").value.trim();
 
     const email =
@@ -768,8 +765,8 @@ document.querySelectorAll(".category[data-category]").forEach(category => {
     return;
   }
 
-const customerCountry = document.getElementById("customer-country").value;
-const countryFilter = document.getElementById("country-filter").value;
+const customerCountry = document.getElementById("market-country-filter").value;
+    const countryFilter = document.getElementById("country-filter").value;
 
 const filteredProducts = data.filter(product => {
   const matchesCategory = !selectedCategory ||
@@ -856,7 +853,7 @@ card.append(category, name, description, price, country, details, addButton);   
   });
 
 }
-  document.getElementById("customer-country")
+document.getElementById("market-country-filter")
   .addEventListener("change", loadPublicProducts);
 
 document.getElementById("country-filter")

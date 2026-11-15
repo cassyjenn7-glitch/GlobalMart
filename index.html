@@ -140,6 +140,33 @@ nav a{margin-left:8px}
  <div id="cart-items"></div>
 <h3 id="cart-total">Total: GHS 0.00</h3>
 </div>
+  <div class="seller-form" id="checkout-section">
+  <h3>Delivery Details</h3>
+
+  <label>Full name
+    <input id="checkout-name" type="text" required>
+  </label>
+
+  <label>Phone number
+    <input id="checkout-phone" type="tel" required>
+  </label>
+
+  <label>Delivery address
+    <input id="checkout-address" type="text" required>
+  </label>
+
+  <label>Payment method
+    <select id="checkout-payment-method" required>
+      <option value="">Choose payment method</option>
+      <option value="paystack">Paystack</option>
+      <option value="cash_on_delivery">Cash on Delivery</option>
+    </select>
+  </label>
+
+  <p class="form-note">
+    Checkout is being prepared. Payments are not active yet.
+  </p>
+</div>
 <div class="filter-section">
 <label for="market-country-filter">Choose your country:</label>  <select id="market-country-filter">
     <option value="">Choose your country</option>

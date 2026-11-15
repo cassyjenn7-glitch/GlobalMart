@@ -165,6 +165,11 @@ nav a{margin-left:8px}
   </label>
 
   <p class="form-note">
+    <button class="btn" id="review-order-button" type="button">
+  Review Order
+</button>
+
+<div id="order-review" class="seller-form" hidden></div>
     Checkout is being prepared. Payments are not active yet.
   </p>
 </div>
@@ -1287,7 +1292,53 @@ async function sendAlexMessage() {
     messages.scrollTop = messages.scrollHeight;
   }
 }
+document.getElementById("review-order-button")
+  .addEventListener("click", () => {
+    const name = document.getElementById("checkout-name").value.trim();
+    const phone = document.getElementById("checkout-phone").value.trim();
+    const address = document.getElementById("checkout-address").value.trim();
+    const payment = document.getElementById("checkout-payment-method").value;
+    const review = document.getElementById("order-review");
 
+    if (cart.length === 0) {
+      alert("Please add a product to your cart first.");
+      return;
+    }
+
+    if (!name || !phone || !address || !payment) {
+      alert("Please complete all delivery details and choose a payment method.");
+      return;
+    }
+
+    const total = cart.reduce(
+      (sum, item) => sum + item.price * item.quantity, 0
+    );
+
+    review.replaceChildren();
+
+    const heading = document.createElement("h3");
+    heading.textContent = "Review Your Order";
+
+    const details = document.createElement("p");
+    details.textContent =
+      "Name: " + name +
+      " | Phone: " + phone +
+      " | Address: " + address;
+
+    const amount = document.createElement("p");
+    amount.textContent = "Order total: GHS " + total.toFixed(2);
+
+    const method = document.createElement("p");
+    method.textContent = "Payment: " +
+      (payment === "paystack" ? "Paystack" : "Cash on Delivery");
+
+    const notice = document.createElement("p");
+    notice.textContent =
+      "Please check your details. Secure order confirmation is coming next.";
+
+    review.append(heading, details, amount, method, notice);
+    review.hidden = false;
+  });
 </script>
 
 </body>

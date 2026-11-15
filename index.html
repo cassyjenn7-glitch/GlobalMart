@@ -50,6 +50,7 @@ nav a{margin-left:8px}
 <a href="#categories">Categories</a>
 <a href="#products">Discover</a>
 <a href="#sellers">Become a Seller</a>
+  <a href="#customers">Customer Account</a>
 <a href="#contact">Contact</a>
 </nav>
 </header>
@@ -212,63 +213,68 @@ nav a{margin-left:8px}
 <section id="customers" class="seller">
   <p class="gold">SHOP WITH GLOBALMART</p>
   <h2>Customer Account</h2>
-  <p>Create an account to manage your purchases and track your orders.</p>
+  <p>Create an account or sign in to manage your purchases and track your orders.</p>
 
-  <div class="seller-form">
-    <h3>Create a customer account</h3>
+  <details>
+    <summary class="btn">CUSTOMER ACCOUNT</summary>
 
-    <label>Full name
-      <input id="customer-name" type="text" required>
-    </label>
+    <div class="seller-form">
+      <h3>Create a customer account</h3>
 
-    <label>Phone number
-      <input id="customer-phone" type="tel" required>
-    </label>
+      <label>Full name
+        <input id="customer-name" type="text" required>
+      </label>
 
-    <label>Country
-      <input id="customer-country" type="text" value="Ghana" required>
-    </label>
+      <label>Phone number
+        <input id="customer-phone" type="tel" required>
+      </label>
 
-    <label>Delivery address
-      <input id="customer-address" type="text" required>
-    </label>
+      <label>Country
+        <input id="customer-country" type="text" value="Ghana" required>
+      </label>
 
-    <label>Email address
-      <input id="customer-register-email" type="email" required>
-    </label>
+      <label>Delivery address
+        <input id="customer-address" type="text" required>
+      </label>
 
-    <label>Password (at least 8 characters)
-      <input id="customer-register-password" type="password" minlength="8" required>
-    </label>
+      <label>Email address
+        <input id="customer-register-email" type="email" required>
+      </label>
 
-    <button class="btn" id="customer-register-button" type="button">
-      Create Customer Account
-    </button>
+      <label>Password (at least 8 characters)
+        <input id="customer-register-password" type="password" minlength="8" required>
+      </label>
 
-    <p id="customer-register-message" class="form-note"></p>
-  </div>
+      <button class="btn" id="customer-register-button" type="button">
+        Create Customer Account
+      </button>
 
-  <div class="seller-form">
-    <h3>Already have a customer account?</h3>
+      <p id="customer-register-message" class="form-note"></p>
+    </div>
 
-    <label>Email address
-      <input id="customer-login-email" type="email" required>
-    </label>
+    <div class="seller-form">
+      <h3>Already have a GlobalMart account?</h3>
+      <p class="form-note">Use the same email and password for your customer or seller account.</p>
 
-    <label>Password
-      <input id="customer-login-password" type="password" required>
-    </label>
+      <label>Email address
+        <input id="customer-login-email" type="email" required>
+      </label>
 
-    <button class="btn" id="customer-login-button" type="button">
-      Customer Login
-    </button>
+      <label>Password
+        <input id="customer-login-password" type="password" required>
+      </label>
 
-    <button class="btn outline" id="customer-logout-button" type="button" hidden>
-      Log Out
-    </button>
+      <button class="btn" id="customer-login-button" type="button">
+        Customer Login
+      </button>
 
-    <p id="customer-login-message" class="form-note"></p>
-  </div>
+      <button class="btn outline" id="customer-logout-button" type="button" hidden>
+        Log Out
+      </button>
+
+      <p id="customer-login-message" class="form-note"></p>
+    </div>
+  </details>
 
   <div id="customer-dashboard" class="seller-form" hidden>
     <h3>My Customer Account</h3>

@@ -1292,12 +1292,15 @@ async function sendAlexMessage() {
     messages.scrollTop = messages.scrollHeight;
   }
 }
+
 document.getElementById("review-order-button")
   .addEventListener("click", () => {
     const name = document.getElementById("checkout-name").value.trim();
     const phone = document.getElementById("checkout-phone").value.trim();
     const address = document.getElementById("checkout-address").value.trim();
     const payment = document.getElementById("checkout-payment-method").value;
+    const country =
+      document.getElementById("market-country-filter").value || "Ghana";
     const review = document.getElementById("order-review");
 
     if (cart.length === 0) {
@@ -1329,16 +1332,85 @@ document.getElementById("review-order-button")
     amount.textContent = "Order total: GHS " + total.toFixed(2);
 
     const method = document.createElement("p");
-    method.textContent = "Payment: " +
+    method.textContent =
+      "Payment: " +
       (payment === "paystack" ? "Paystack" : "Cash on Delivery");
 
-    const notice = document.createElement("p");
-    notice.textContent =
-      "Please check your details. Secure order confirmation is coming next.";
+    const confirmButton = document.createElement("button");
+    confirmButton.className = "btn";
+    confirmButton.type = "button";
+    confirmButton.textContent = "Confirm & Place Order";
 
-    review.append(heading, details, amount, method, notice);
+    const message = document.createElement("p");
+
+    confirmButton.addEventListener("click", async () => {
+      confirmButton.disabled = true;
+      message.textContent = "Saving your order...";
+
+      try {
+        const { data: sessionData } = await db.auth.getSession();
+
+        if (!sessionData.session) {
+          throw new Error("Please log in to your customer account first.");
+        }
+
+        const { data, error } = await db.functions.invoke("create-order", {
+          body: {
+            name,
+            phone,
+            address,
+            country,
+            payment_method: payment,
+            items: cart.map(item => ({
+              id: item.id,
+              quantity: item.quantity
+            }))
+          }
+        });
+
+        if (error) throw error;
+        if (!data || !data.success || !data.order?.id) {
+          throw new Error(data?.error || "Could not create your order.");
+        }
+
+        if (payment === "paystack") {
+          message.textContent = "Order saved. Preparing secure payment...";
+
+          const { data: paymentData, error: paymentError } =
+            await db.functions.invoke("paystack-payment", {
+              body: { order_id: data.order.id }
+            });
+
+          if (paymentError) throw paymentError;
+
+          if (!paymentData?.authorization_url) {
+            throw new Error(
+              paymentData?.error || "Payment link was not returned."
+            );
+          }
+
+          window.location.assign(paymentData.authorization_url);
+          return;
+        }
+
+        message.textContent =
+          "Your order has been placed successfully! Payment is due on delivery.";
+
+        cart = [];
+        updateCart();
+        confirmButton.remove();
+      } catch (error) {
+        console.error("GlobalMart checkout error:", error);
+        message.textContent =
+          error.message || "Checkout failed. Please try again.";
+        confirmButton.disabled = false;
+      }
+    });
+
+    review.append(heading, details, amount, method, confirmButton, message);
     review.hidden = false;
   });
+
 </script>
 
 </body>

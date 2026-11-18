@@ -508,22 +508,7 @@ const customerLoginMessage =
 
 const customerLogoutButton =
   document.getElementById("customer-logout-button");
-  document.getElementById("customer-forgot-password-button")
-  .addEventListener("click", async () => {
-    const email = document.getElementById("customer-login-email").value.trim();
-
-    if (!email) {
-      customerLoginMessage.textContent =
-        "Please enter your email address first.";
-      return;
-    }
-
-    customerLoginMessage.textContent = "Sending password reset email...";
-
-    const { error } = await db.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin + window.location.pathname
-    });
-
+ 
     customerLoginMessage.textContent = error
       ? "Could not send reset email: " + error.message
       : "Please check your email inbox and spam folder for the password reset link.";

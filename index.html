@@ -314,6 +314,20 @@ nav a{margin-left:8px}
       </button>
 
       <p id="customer-login-message" class="form-note"></p>
+      <div id="customer-new-password-panel" hidden>
+  <h3>Choose a New Password</h3>
+  <input
+    id="customer-new-password"
+    type="password"
+    placeholder="Enter new password"
+    minlength="8"
+    autocomplete="new-password"
+  >
+  <button class="btn" id="customer-save-password-button" type="button">
+    Save New Password
+  </button>
+  <p id="customer-reset-message" class="form-note"></p>
+</div>
     </div>
   </details>
 
@@ -581,7 +595,29 @@ document.getElementById("customer-register-button")
       ? error.message
       : "Registration successful! Please check your email to confirm your account, then log in.";
   });
+document.getElementById("customer-save-password-button")
+  .addEventListener("click", async () => {
+    const password = document.getElementById("customer-new-password").value;
+    const message = document.getElementById("customer-reset-message");
 
+    if (password.length < 8) {
+      message.textContent = "Password must be at least 8 characters.";
+      return;
+    }
+
+    message.textContent = "Updating your password...";
+
+    const { error } = await db.auth.updateUser({ password });
+
+    if (error) {
+      message.textContent = "Password update failed: " + error.message;
+      return;
+    }
+
+    message.textContent = "Your password has been changed successfully!";
+    document.getElementById("customer-new-password-panel").hidden = true;
+    document.getElementById("customer-new-password").value = "";
+  });
 async function loadCustomerDashboard(session) {
   const dashboard =
     document.getElementById("customer-dashboard");
@@ -1252,6 +1288,11 @@ async function loadAdminDashboard(session) {
 }
 // Connect customer, seller and admin dashboards to login
 db.auth.onAuthStateChange((event, session) => {
+  if (event === "PASSWORD_RECOVERY") {
+    document.getElementById("customer-login-message").textContent =
+      "Enter your new password to complete your reset.";
+    document.getElementById("customer-new-password-panel").hidden = false;
+  }
   setTimeout(() => {
     loadSellerDashboard(session);
     loadCustomerDashboard(session);

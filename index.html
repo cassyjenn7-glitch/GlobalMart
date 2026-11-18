@@ -336,6 +336,19 @@ nav a{margin-left:8px}
   </div>
 
   <div class="seller-form">
+    <div class="seller-form">
+  <h3>Sales Overview</h3>
+  <p id="seller-order-count">Orders: Loading...</p>
+  <p id="seller-total-sales">Total Sales: GHS 0.00</p>
+  <p id="seller-commission">GlobalMart Commission (10%): GHS 0.00</p>
+  <p id="seller-pending-earnings">Pending Earnings: GHS 0.00</p>
+  <p id="seller-available-payout">Available for Payout: GHS 0.00</p>
+</div>
+
+<div class="seller-form">
+  <h3>Customer Orders</h3>
+  <div id="seller-orders">Your customer orders will appear here.</div>
+</div>
     <h3>Add a New Product</h3>
     <label>Product name
       <input id="product-name" type="text" required>
@@ -690,6 +703,93 @@ customerLogoutButton.addEventListener("click", async () => {
 
   document.getElementById("customer-dashboard").hidden = true;
 });
+  // Load seller sales and customer orders
+async function loadSellerSalesDashboard() {
+  const message = document.getElementById("seller-orders");
+
+  message.textContent = "Loading your sales and orders...";
+
+  const { data: { session } } = await db.auth.getSession();
+
+  if (!session) {
+    message.textContent = "Please log in to view your sales.";
+    return;
+  }
+
+  const { data, error } = await db.functions.invoke(
+    "dynamic-service",
+    { body: {} }
+  );
+
+  if (error) {
+    message.textContent = "Could not load sales: " + error.message;
+    return;
+  }
+
+  if (!data || !data.success) {
+    message.textContent = data?.error || "Sales information could not be loaded.";
+    return;
+  }
+
+  const summary = data.summary;
+
+  document.getElementById("seller-order-count").textContent =
+    "Orders: " + summary.order_count;
+
+  document.getElementById("seller-total-sales").textContent =
+    "Total Sales: GHS " + Number(summary.total_order_value).toFixed(2);
+
+  document.getElementById("seller-commission").textContent =
+    "GlobalMart Commission (10%): GHS " +
+    Number(summary.total_commission).toFixed(2);
+
+  document.getElementById("seller-pending-earnings").textContent =
+    "Pending Earnings: GHS " +
+    Number(summary.pending_earnings).toFixed(2);
+
+  document.getElementById("seller-available-payout").textContent =
+    "Available for Payout: GHS " +
+    Number(summary.available_for_payout).toFixed(2);
+
+  message.replaceChildren();
+
+  if (!data.orders || data.orders.length === 0) {
+    message.textContent = "You have no customer orders yet.";
+    return;
+  }
+
+  data.orders.forEach(order => {
+    const item = document.createElement("div");
+    item.className = "category";
+
+    const heading = document.createElement("h4");
+    heading.textContent = "Order: " + order.order_id;
+
+    const customer = document.createElement("p");
+    customer.textContent = "Customer: " + order.customer.name;
+
+    const status = document.createElement("p");
+    status.textContent =
+      "Payment: " + order.payment_status +
+      " | Delivery: " + order.delivery_status;
+
+    const earnings = document.createElement("p");
+    earnings.textContent =
+      "Your Earnings: GHS " +
+      Number(order.seller_earnings).toFixed(2);
+
+    item.append(heading, customer, status, earnings);
+
+    order.items.forEach(product => {
+      const detail = document.createElement("p");
+      detail.textContent =
+        product.product_name + " × " + product.quantity;
+      item.appendChild(detail);
+    });
+
+    message.appendChild(item);
+  });
+}
   // Load the seller dashboard
 async function loadSellerDashboard(session) {
   const dashboard = document.getElementById("seller-dashboard");
@@ -1011,8 +1111,10 @@ document.getElementById("add-product-button")
     document.getElementById("product-image").value = "";
     document.getElementById("product-category").value = "";
 
-    await loadMyProducts();
-  });
+  await loadMyProducts();
+  await loadSellerSalesDashboard();
+}
+
 async function loadAdminDashboard(session) {
   const dashboard = document.getElementById("admin-dashboard");
 

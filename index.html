@@ -204,6 +204,7 @@ nav a{margin-left:8px}
 </section>
 
 
+
 <section class="seller" id="sellers">
   <p class="gold">JOIN OUR MARKETPLACE</p>
   <h2>Become a GlobalMart Seller</h2>
@@ -219,35 +220,52 @@ nav a{margin-left:8px}
         <input id="register-business" type="text" required>
       </label>
 
-     <label>Email address
-  <input id="register-email" type="email" required>
-</label>
+      <label>Email address
+        <input id="register-email" type="email" required>
+      </label>
 
+      <label>Store address
+        <input id="register-store-address" type="text" required>
+      </label>
 
-  
-<label>Store address
-  <input id="register-store-address" type="text" required placeholder="Enter your shop or business address">
-</label>
+      <label>Password (at least 8 characters)
+        <input id="register-password" type="password" minlength="8" required>
+      </label>
 
+      <button class="btn" id="register-button" type="button">
+        Register as a seller
+      </button>
+      <p id="register-message" class="form-note"></p>
+    </div>
 
-<div class="seller-form">
-<h3>Already have an account?</h3>
-<label>Email address
-<input id="login-email" type="email" required>
-</label>
-<label>Password
-<input id="login-password" type="password" required>
-</label>
-  <button class="btn" id="customer-login-button" type="button">
-  Customer Login
-</button>
- <button class="btn outline" id="forgot-password-button" type="button">
-  Forgot password?
-</button>
-<button class="btn outline" id="logout-button" type="button" hidden>Log out</button>
-<p id="login-message" class="form-note"></p>
-</div>
+    <div class="seller-form">
+      <h3>Already have an account?</h3>
+
+      <label>Email address
+        <input id="login-email" type="email" required>
+      </label>
+
+      <label>Password
+        <input id="login-password" type="password" required>
+      </label>
+
+      <button class="btn" id="login-button" type="button">
+        Seller Login
+      </button>
+
+      <button class="btn outline" id="forgot-password-button" type="button">
+        Forgot password?
+      </button>
+
+      <button class="btn outline" id="logout-button" type="button" hidden>
+        Log out
+      </button>
+
+      <p id="login-message" class="form-note"></p>
+    </div>
+  </details>
 </section>
+
 <section id="customers" class="seller">
   <p class="gold">SHOP WITH GLOBALMART</p>
   <h2>Customer Account</h2>

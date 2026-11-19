@@ -520,13 +520,6 @@ const customerRegisterMessage =
 const customerLoginMessage =
   document.getElementById("customer-login-message");
 
-const customerLogoutButton =
-  document.getElementById("customer-logout-button");
- 
-    customerLoginMessage.textContent = error
-      ? "Could not send reset email: " + error.message
-      : "Please check your email inbox and spam folder for the password reset link.";
-  });
   document.getElementById("customer-forgot-password-button")
   .addEventListener("click", async () => {
     const email = document.getElementById("customer-login-email").value.trim();

@@ -155,7 +155,13 @@ nav a{margin-left:8px}
   <label>Delivery address
     <input id="checkout-address" type="text" required>
   </label>
-
+<label>Delivery method
+  <select id="checkout-delivery-method" required>
+    <option value="">Choose delivery method</option>
+    <option value="home_delivery">Home Delivery</option>
+    <option value="customer_pickup">Customer Pickup</option>
+  </select>
+</label>
   <label>Payment method
     <select id="checkout-payment-method" required>
       <option value="">Choose payment method</option>
@@ -1482,6 +1488,8 @@ document.getElementById("review-order-button")
     const name = document.getElementById("checkout-name").value.trim();
     const phone = document.getElementById("checkout-phone").value.trim();
     const address = document.getElementById("checkout-address").value.trim();
+    const deliveryMethod =
+  document.getElementById("checkout-delivery-method").value;
     const payment = document.getElementById("checkout-payment-method").value;
     const country =
       document.getElementById("market-country-filter").value || "Ghana";
@@ -1491,8 +1499,7 @@ document.getElementById("review-order-button")
       alert("Please add a product to your cart first.");
       return;
     }
-
-    if (!name || !phone || !address || !payment) {
+    if (!name || !phone || !address || !payment || !deliveryMethod) {
       alert("Please complete all delivery details and choose a payment method.");
       return;
     }
@@ -1500,6 +1507,12 @@ document.getElementById("review-order-button")
     const total = cart.reduce(
       (sum, item) => sum + item.price * item.quantity, 0
     );
+    const deliveryFee =
+  deliveryMethod === "customer_pickup" || total > 10000
+    ? 0
+    : 50;
+
+const grandTotal = total + deliveryFee;
 
     review.replaceChildren();
 
@@ -1513,8 +1526,10 @@ document.getElementById("review-order-button")
       " | Address: " + address;
 
     const amount = document.createElement("p");
-    amount.textContent = "Order total: GHS " + total.toFixed(2);
-
+amount.textContent =
+  "Subtotal: GHS " + total.toFixed(2) +
+  " | Delivery: GHS " + deliveryFee.toFixed(2) +
+  " | Grand Total: GHS " + grandTotal.toFixed(2);
     const method = document.createElement("p");
     method.textContent =
       "Payment: " +

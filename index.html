@@ -1560,13 +1560,11 @@ amount.textContent =
             address,
             country,
             payment_method: payment,
-            items: cart.map(item => ({
-              delivery_method: deliveryMethod,
-              id: item.id,
-              quantity: item.quantity
-            }))
-          }
-        });
+delivery_method: deliveryMethod,
+items: cart.map(item => ({
+  id: item.id,
+  quantity: item.quantity
+}))
 
         if (error) throw error;
         if (!data || !data.success || !data.order?.id) {

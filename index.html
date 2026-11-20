@@ -866,12 +866,59 @@ async function loadSellerSalesDashboard() {
 
     item.append(heading, customer, status, earnings);
 
-    order.items.forEach(product => {
+       order.items.forEach(product => {
       const detail = document.createElement("p");
       detail.textContent =
         product.product_name + " × " + product.quantity;
       item.appendChild(detail);
     });
+
+    if (order.delivery_status !== "delivered") {
+      const deliveryButton = document.createElement("button");
+      deliveryButton.className = "btn";
+
+      const nextStatus =
+        order.delivery_status === "dispatched"
+          ? "delivered"
+          : "dispatched";
+
+      deliveryButton.textContent =
+        nextStatus === "dispatched"
+          ? "Mark as Dispatched"
+          : "Mark as Delivered";
+
+      deliveryButton.addEventListener("click", async () => {
+        deliveryButton.disabled = true;
+        deliveryButton.textContent = "Updating...";
+
+        const { data: updateData, error: updateError } =
+          await db.functions.invoke("dynamic-service", {
+            body: {
+              action: "update_delivery",
+              order_id: order.order_id,
+              delivery_status: nextStatus
+            }
+          });
+
+        if (updateError || !updateData?.success) {
+          alert(
+            updateData?.error ||
+            updateError?.message ||
+            "Could not update delivery status."
+          );
+          deliveryButton.disabled = false;
+          deliveryButton.textContent =
+            nextStatus === "dispatched"
+              ? "Mark as Dispatched"
+              : "Mark as Delivered";
+          return;
+        }
+
+        await loadSellerSalesDashboard();
+      });
+
+      item.appendChild(deliveryButton);
+    }
 
     message.appendChild(item);
   });

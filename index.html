@@ -1561,6 +1561,7 @@ amount.textContent =
             country,
             payment_method: payment,
             items: cart.map(item => ({
+              delivery_method: deliveryMethod,
               id: item.id,
               quantity: item.quantity
             }))

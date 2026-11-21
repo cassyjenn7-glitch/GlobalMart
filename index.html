@@ -1005,6 +1005,65 @@ document.getElementById("seller-payout-balance").textContent =
     message.appendChild(item);
   });
 }
+  // Request seller payout
+document.getElementById("request-payout-button")
+  .addEventListener("click", async () => {
+    const button = document.getElementById("request-payout-button");
+    const message = document.getElementById("payout-message");
+
+    const payoutMethod =
+      document.getElementById("payout-method").value;
+    const accountName =
+      document.getElementById("payout-account-name").value.trim();
+    const accountNumber =
+      document.getElementById("payout-account-number").value.trim();
+    const provider =
+      document.getElementById("payout-provider").value.trim();
+    const amount =
+      Number(document.getElementById("payout-amount").value);
+
+    if (!payoutMethod || !accountName || !accountNumber ||
+        !provider || !Number.isFinite(amount) || amount <= 0) {
+      message.textContent = "Please complete all payout details.";
+      return;
+    }
+
+    button.disabled = true;
+    button.textContent = "Submitting...";
+    message.textContent = "";
+
+    try {
+      const { data, error } = await db.functions.invoke(
+        "dynamic-service",
+        {
+          body: {
+            action: "request_payout",
+            payout_method: payoutMethod,
+            account_name: accountName,
+            account_number: accountNumber,
+            bank_or_provider: provider,
+            amount: amount
+          }
+        }
+      );
+
+      if (error || !data?.success) {
+        message.textContent =
+          data?.error || error?.message ||
+          "Could not submit payout request.";
+      } else {
+        message.textContent =
+          "Payout request submitted. Status: Pending admin review.";
+        document.getElementById("payout-amount").value = "";
+        await loadSellerSalesDashboard();
+      }
+    } catch (error) {
+      message.textContent = "Something went wrong. Please try again.";
+    } finally {
+      button.disabled = false;
+      button.textContent = "Request Payout";
+    }
+  });
   // Load the seller dashboard
 async function loadSellerDashboard(session) {
   const dashboard = document.getElementById("seller-dashboard");

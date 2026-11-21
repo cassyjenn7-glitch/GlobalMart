@@ -379,7 +379,36 @@ nav a{margin-left:8px}
     <p id="dashboard-business" class="muted">Loading your business profile...</p>
     <p id="dashboard-email" class="muted"></p>
   </div>
+<div class="seller-form" id="seller-subscription">
+  <h3>Seller Membership</h3>
 
+  <p>
+    Current Plan:
+    <strong id="seller-plan">Loading...</strong>
+  </p>
+
+  <p id="seller-subscription-status">
+    Checking subscription...
+  </p>
+
+  <p id="seller-subscription-expiry"></p>
+
+  <p><strong>Premium Seller — GHS 50 / 30 days</strong></p>
+
+  <ul>
+    <li>Premium seller badge</li>
+    <li>Greater shop visibility</li>
+    <li>Featured product opportunities</li>
+    <li>Advanced sales reports</li>
+    <li>Priority seller support</li>
+  </ul>
+
+  <button class="btn" id="upgrade-premium-button" type="button">
+    Upgrade to Premium
+  </button>
+
+  <p id="premium-message"></p>
+</div>
   <div class="seller-form">
     <div class="seller-form">
   <h3>Sales Overview</h3>
@@ -1096,6 +1125,78 @@ async function loadSellerDashboard(session) {
 
   await loadMyProducts();
   await loadSellerSalesDashboard();
+  await loadSellerSubscription(user.id);
+}
+  async function loadSellerSubscription(sellerId) {
+    document.getElementById("upgrade-premium-button")
+  .addEventListener("click", async () => {
+    const message = document.getElementById("premium-message");
+    const { data: { session } } = await db.auth.getSession();
+
+    if (!session) {
+      message.textContent = "Please log in as a seller first.";
+      return;
+    }
+
+    message.textContent = "Preparing your Premium subscription...";
+
+    const { data, error } = await db.functions.invoke(
+      "start-premium-subscription",
+      {
+        body: {}
+      }
+    );
+
+    if (error || !data || !data.success) {
+      message.textContent =
+        data?.error || error?.message || "Could not prepare Premium subscription.";
+      return;
+    }
+
+    message.textContent =
+      "Payment reference created: " + data.reference +
+      ". Paystack payment is not connected yet. No money has been collected.";
+  });
+  const planElement = document.getElementById("seller-plan");
+  const statusElement = document.getElementById("seller-subscription-status");
+  const expiryElement = document.getElementById("seller-subscription-expiry");
+
+  planElement.textContent = "Loading...";
+
+  const { data, error } = await db
+    .from("seller_subscriptions")
+    .select("plan, status, current_period_end")
+    .eq("seller_id", sellerId)
+    .maybeSingle();
+
+  if (error) {
+    planElement.textContent = "Unavailable";
+    statusElement.textContent = error.message;
+    return;
+  }
+
+  if (!data) {
+    planElement.textContent = "Free Seller";
+    statusElement.textContent = "No subscription record found.";
+    expiryElement.textContent = "";
+    return;
+  }
+
+  const isPremium =
+    data.plan === "premium" &&
+    data.status === "active" &&
+    data.current_period_end &&
+    new Date(data.current_period_end) > new Date();
+
+  planElement.textContent = isPremium ? "Premium Seller" : "Free Seller";
+
+  statusElement.textContent = isPremium
+    ? "Your Premium membership is active."
+    : "You are currently on the Free plan.";
+
+  expiryElement.textContent = isPremium
+    ? "Premium expires: " + new Date(data.current_period_end).toLocaleDateString()
+    : "";
 }
 // Load approved products for public customers
 // Load approved products for public customers

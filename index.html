@@ -394,7 +394,44 @@ nav a{margin-left:8px}
   <h3>Customer Orders</h3>
 <div id="seller-orders">Your customer orders will appear here.</div>
 </div>
+<h3>Seller Payouts</h3>
+<div class="seller-form">
+  <h4>Request a Payout</h4>
 
+  <p id="seller-payout-balance">
+    Available for payout: GHS 0.00
+  </p>
+
+  <label>Payout method
+    <select id="payout-method" required>
+      <option value="">Choose method</option>
+      <option value="mobile_money">Mobile Money</option>
+      <option value="bank">Bank Transfer</option>
+    </select>
+  </label>
+
+  <label>Account name
+    <input id="payout-account-name" type="text" required>
+  </label>
+
+  <label>Account number
+    <input id="payout-account-number" type="text" required>
+  </label>
+
+  <label>Bank or Mobile Money provider
+    <input id="payout-provider" type="text" required>
+  </label>
+
+  <label>Amount (GHS)
+    <input id="payout-amount" type="number" min="1" step="0.01" required>
+  </label>
+
+  <button class="btn" id="request-payout-button" type="button">
+    Request Payout
+  </button>
+
+  <p id="payout-message"></p>
+</div>
   
 
     <h3>Add a New Product</h3>

@@ -392,8 +392,84 @@ nav a{margin-left:8px}
 
 <div class="seller-form">
   <h3>Customer Orders</h3>
-  <div id="seller-orders">Your customer orders will appear here.</div>
+<div id="seller-orders">Your customer orders will appear here.</div>
 </div>
+<h3>Seller Payouts</h3>
+
+<div class="seller-form">
+  <p id="seller-payout-balance">
+    Available for payout: GHS 0.00
+  </p>
+
+  <label>Payout method
+    <select id="payout-method" required>
+      <option value="">Choose method</option>
+      <option value="mobile_money">Mobile Money</option>
+      <option value="bank">Bank Transfer</option>
+    </select>
+  </label>
+
+  <label>Account name
+    <input id="payout-account-name" type="text" required>
+  </label>
+
+  <label>Account number
+    <input id="payout-account-number" type="text" required>
+  </label>
+
+  <label>Bank or Mobile Money provider
+    <input id="payout-provider" type="text" required>
+  </label>
+
+  <label>Amount (GHS)
+    <input id="payout-amount" type="number" min="1" step="0.01" required>
+  </label>
+
+  <button class="btn" id="request-payout-button" type="button">
+    Request Payout
+  </button>
+
+  <p id="payout-message"></p>
+</div>
+<h3>Seller Payouts</h3>
+<div class="seller-form">
+  <p id="seller-payout-balance">
+    Available for payout: GHS 0.00
+  </p>
+
+  <h4>Request a Payout</h4>
+
+  <label>Payout method
+    <select id="payout-method" required>
+      <option value="">Choose method</option>
+      <option value="mobile_money">Mobile Money</option>
+      <option value="bank">Bank Transfer</option>
+    </select>
+  </label>
+
+  <label>Account name
+    <input id="payout-account-name" type="text" required>
+  </label>
+
+  <label>Account number
+    <input id="payout-account-number" type="text" required>
+  </label>
+
+  <label>Bank or Mobile Money provider
+    <input id="payout-provider" type="text" required>
+  </label>
+
+  <label>Amount (GHS)
+    <input id="payout-amount" type="number" min="1" step="0.01" required>
+  </label>
+
+  <button class="btn" id="request-payout-button" type="button">
+    Request Payout
+  </button>
+
+  <p id="payout-message"></p>
+</div>
+
     <h3>Add a New Product</h3>
     <label>Product name
       <input id="product-name" type="text" required>
@@ -876,7 +952,9 @@ async function loadSellerSalesDashboard() {
   document.getElementById("seller-available-payout").textContent =
     "Available for Payout: GHS " +
     Number(summary.available_for_payout).toFixed(2);
-
+document.getElementById("seller-payout-balance").textContent =
+  "Available for payout: GHS " +
+  Number(summary.available_for_payout).toFixed(2);
   message.replaceChildren();
 
   if (!data.orders || data.orders.length === 0) {

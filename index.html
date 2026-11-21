@@ -742,6 +742,46 @@ if (!customerProfile) {
       Number(order.total_amount).toFixed(2);
 
     item.append(heading, status, payment, total);
+        if (
+      order.delivery_status === "delivered" &&
+      !order.customer_confirmed_at
+    ) {
+      const confirmButton = document.createElement("button");
+      confirmButton.className = "btn";
+      confirmButton.textContent = "Confirm Package Received";
+
+      confirmButton.addEventListener("click", async () => {
+        confirmButton.disabled = true;
+        confirmButton.textContent = "Confirming...";
+
+        const { data, error } = await db.functions.invoke(
+          "customer-confirm-order",
+          {
+            body: {
+              order_id: order.id
+            }
+          }
+        );
+
+        if (error || !data?.success) {
+          alert(
+            data?.error ||
+            error?.message ||
+            "Could not confirm package receipt."
+          );
+
+          confirmButton.disabled = false;
+          confirmButton.textContent = "Confirm Package Received";
+          return;
+        }
+
+        alert("Thank you! Your package receipt is confirmed.");
+
+        await loadCustomerDashboard();
+      });
+
+      item.appendChild(confirmButton);
+    }
     ordersBox.appendChild(item);
   });
 }

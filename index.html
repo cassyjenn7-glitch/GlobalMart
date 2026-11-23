@@ -975,8 +975,29 @@ document.getElementById("seller-payout-balance").textContent =
       "Your Earnings: GHS " +
       Number(order.seller_earnings).toFixed(2);
 
-    item.append(heading, customer, status, earnings);
+const placed = document.createElement("p");
+placed.textContent = "Order placed: " + (
+  order.created_at
+    ? new Date(order.created_at).toLocaleString("en-GH", {
+        dateStyle: "medium",
+        timeStyle: "short",
+        timeZone: "Africa/Accra"
+      })
+    : "Not available"
+);
 
+const delivered = document.createElement("p");
+delivered.textContent = "Delivered: " + (
+  order.delivered_at
+    ? new Date(order.delivered_at).toLocaleString("en-GH", {
+        dateStyle: "medium",
+        timeStyle: "short",
+        timeZone: "Africa/Accra"
+      })
+    : "Not delivered yet"
+);
+
+item.append(heading, customer, placed, delivered, status, earnings);
        order.items.forEach(product => {
       const detail = document.createElement("p");
       detail.textContent =

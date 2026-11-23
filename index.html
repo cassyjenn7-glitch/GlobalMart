@@ -886,6 +886,36 @@ item.append(heading, placed, delivered, status, payment, total);
           confirmButton.textContent = "Confirm Package Received";
           return;
         }
+       
+        // Release delivery partner earnings after customer confirmation.
+        const { data: shipment, error: shipmentLookupError } = await db
+          .from("delivery_shipments")
+          .select("id")
+          .eq("order_id", order.id)
+          .maybeSingle();
+
+        if (shipmentLookupError) {
+          alert("Your order is confirmed, but delivery earnings could not be updated. Please contact GlobalMart support.");
+          console.error(shipmentLookupError);
+          await loadCustomerDashboard();
+          return;
+        }
+
+        if (shipment) {
+          const { data: deliveryResult, error: deliveryError } =
+            await db.rpc("confirm_delivery_receipt", {
+              p_shipment_id: shipment.id
+            });
+
+          if (deliveryError || !deliveryResult?.success) {
+            alert(
+              "Your order is confirmed, but delivery earnings could not be released. Please contact GlobalMart support."
+            );
+            console.error(deliveryError || deliveryResult);
+            await loadCustomerDashboard();
+            return;
+          }
+        }
 
         alert("Thank you! Your package receipt is confirmed.");
 

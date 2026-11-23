@@ -1287,7 +1287,7 @@ document.querySelectorAll(".category[data-category]").forEach(category => {
 
   const { data, error } = await db
     .from("products")
-.select("id, name, description, price, image_url, category, country_of_origin")
+.select("id, name, description, price, image_url, category, country_of_origin, seller_id")
     .eq("status", "active")
     .order("created_at", { ascending: false });
 
@@ -1297,7 +1297,13 @@ document.querySelectorAll(".category[data-category]").forEach(category => {
     container.textContent = "Products could not be loaded: " + error.message;
     return;
   }
+const { data: premiumSellers } = await db
+  .from("public_premium_sellers")
+  .select("seller_id");
 
+const premiumSellerIds = new Set(
+  (premiumSellers || []).map(seller => seller.seller_id)
+);
   if (!data || data.length === 0) {
     container.textContent = "No approved products available yet.";
     return;
@@ -1350,9 +1356,17 @@ const filteredProducts = data.filter(product => {
     category.className = "gold";
     category.textContent = product.category || "Uncategorized";
 
-    const name = document.createElement("h3");
-    name.textContent = product.name;
+card.append(category);
 
+if (premiumSellerIds.has(product.seller_id)) {
+  card.appendChild(premiumBadge);
+}
+
+card.append(name, description, price, country, details, addButton);
+    name.textContent = product.name;
+const premiumBadge = document.createElement("span");
+premiumBadge.className = "premium-badge";
+premiumBadge.textContent = "★ PREMIUM SELLER";
     const description = document.createElement("p");
     description.textContent = product.description || "";
 
@@ -1420,7 +1434,7 @@ async function loadMyProducts() {
     const item = document.createElement("div");
     item.className = "category";
 
-    const name = document.createElement("h3");
+    card.append(category, name, description, price, country, details, addButton);
     name.textContent = product.name;
 
     const description = document.createElement("p");
@@ -1697,6 +1711,17 @@ db.auth.getSession().then(({ data: { session } }) => {
     cursor: pointer;
     border-radius: 6px;
   }
+  .premium-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #d4af37, #f5d76e);
+  color: #222;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  margin: 8px 0;
+  letter-spacing: 0.5px;
+}
 </style>
 
 <button id="alex-button" onclick="toggleAlex()">

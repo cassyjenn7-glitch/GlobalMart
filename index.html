@@ -1,4 +1,4 @@
-<!DOCTYPE html>s
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1362,15 +1362,15 @@ async function loadPublicProducts() {
     category.className = "gold";
     category.textContent = product.category || "Uncategorized";
 
-    const premiumBadge = document.createElement("span");
-    premiumBadge.className = "premium-badge";
-    premiumBadge.textContent = "★ PREMIUM SELLER";
-
     const name = document.createElement("h3");
     name.textContent = product.name;
 
     const description = document.createElement("p");
     description.textContent = product.description || "";
+
+    const premiumBadge = document.createElement("span");
+    premiumBadge.className = "premium-badge";
+    premiumBadge.textContent = "★ PREMIUM SELLER";
 
     const price = document.createElement("p");
     price.textContent =
@@ -1425,132 +1425,12 @@ async function loadPublicProducts() {
   });
 }
 
-
-  const { data, error } = await db
-    .from("products")
-.select("id, name, description, price, image_url, category, country_of_origin, seller_id")
-    .eq("status", "active")
-    .order("created_at", { ascending: false });
-
-  container.replaceChildren();
-
-  if (error) {
-    container.textContent = "Products could not be loaded: " + error.message;
-    return;
-  }
-const { data: premiumSellers } = await db
-  .from("public_premium_sellers")
-  .select("seller_id");
-
-const premiumSellerIds = new Set(
-  (premiumSellers || []).map(seller => seller.seller_id)
-);
-  if (!data || data.length === 0) {
-    container.textContent = "No approved products available yet.";
-    return;
-  }
-
-const customerCountry = document.getElementById("market-country-filter").value;
-    const countryFilter = document.getElementById("country-filter").value;
-
-const filteredProducts = data.filter(product => {
-  const matchesCategory = !selectedCategory ||
-    (product.category || "").trim().toLowerCase() ===
-    selectedCategory.trim().toLowerCase();
-
-  const productCountry = (product.country_of_origin || "").trim().toLowerCase();
-  const selectedCountry = customerCountry.trim().toLowerCase();
-
-  const matchesCountry =
-    countryFilter === "all" ||
-    (countryFilter === "local" &&
-      selectedCountry !== "" &&
-      productCountry === selectedCountry) ||
-    (countryFilter === "international" &&
-      selectedCountry !== "" &&
-      productCountry !== "" &&
-      productCountry !== selectedCountry);
-
-  return matchesCategory && matchesCountry;
-});
-
-  if (filteredProducts.length === 0) {
-    container.textContent = "No products available in this category yet.";
-    return;
-  }
-
-  filteredProducts.forEach(product => {
-    const card = document.createElement("div");
-    card.className = "product";
-
-    if (product.image_url) {
-      const image = document.createElement("img");
-      image.src = product.image_url;
-      image.alt = product.name;
-      image.style.width = "100%";
-      image.style.height = "160px";
-      image.style.objectFit = "cover";
-      card.appendChild(image);
-    }
-
-    const category = document.createElement("p");
-    category.className = "gold";
-    category.textContent = product.category || "Uncategorized";
-
-card.append(category);
-
-if (premiumSellerIds.has(product.seller_id)) {
-  card.appendChild(premiumBadge);
-}
-
-card.append(name, description, price, country, details, addButton);
-    name.textContent = product.name;
-const premiumBadge = document.createElement("span");
-premiumBadge.className = "premium-badge";
-premiumBadge.textContent = "★ PREMIUM SELLER";
-    const description = document.createElement("p");
-    description.textContent = product.description || "";
-
-    const price = document.createElement("p");
-    price.textContent = "Price: GHS " + Number(product.price).toFixed(2);
-    const country = document.createElement("p");
-country.textContent = "Ships from: " + (product.country_of_origin || "Country not specified");
-
-    const details = document.createElement("button");
-    details.className = "btn";
-    details.textContent = "View Details";
-    
-
-    details.addEventListener("click", () => {
-      const message = encodeURIComponent(
-        "Hello GlobalMart! I am interested in " + product.name +
-        ". Price: GHS " + Number(product.price).toFixed(2) +
-        ". Please provide more information."
-      );
-
-      window.open(
-        "https://wa.me/233209642135?text=" + message,
-        "_blank"
-      );
-    });
-
-const addButton = document.createElement("button");
-addButton.className = "btn";
-addButton.textContent = "Add to Cart";
-
-addButton.addEventListener("click", () => {
-  addToCart(product);
-});
-
-card.append(category, name, description, price, country, details, addButton);    container.appendChild(card);
-  });
-
-}
 document.getElementById("market-country-filter")
   .addEventListener("change", loadPublicProducts);
 
 document.getElementById("country-filter")
   .addEventListener("change", loadPublicProducts);
+
 async function loadMyProducts() {
   const { data, error } = await db
     .from("products")
@@ -1591,31 +1471,8 @@ async function loadMyProducts() {
   });
 }
 
-  if (!data || data.length === 0) {
-    container.textContent = "You have not submitted any products yet.";
-    return;
-  }
+loadPublicProducts();
 
-  data.forEach(product => {
-    const item = document.createElement("div");
-    item.className = "category";
-
-    card.append(category, name, description, price, country, details, addButton);
-    name.textContent = product.name;
-
-    const description = document.createElement("p");
-    description.textContent = product.description || "";
-
-    const price = document.createElement("p");
-    price.textContent = "Price: GHS " + Number(product.price).toFixed(2);
-
-    const status = document.createElement("p");
-    status.textContent = "Status: " + product.status;
-
-    item.append(name, description, price, status);
-    container.appendChild(item);
-  });
-}
 document.getElementById("add-product-button")
   .addEventListener("click", async () => {
     const { data: { session } } = await db.auth.getSession();

@@ -2085,5 +2085,162 @@ items: cart.map(item => ({
   </div>
 </section>
 
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const form = document.getElementById("delivery-partner-form");
+  const message = document.getElementById("delivery-partner-message");
+  const dashboardButton = document.getElementById("load-delivery-dashboard");
+  const dashboardResults = document.getElementById("delivery-dashboard-results");
+
+  if (!form || !message || !dashboardButton || !dashboardResults) {
+    return;
+  }
+
+  // SUBMIT DELIVERY PARTNER APPLICATION
+  form.addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    message.textContent = "Submitting your application...";
+
+    const partnerType = document.getElementById("delivery-partner-type").value;
+    const fullName = document.getElementById("delivery-full-name").value.trim();
+    const companyName = document.getElementById("delivery-company-name").value.trim();
+
+    if (partnerType === "individual" && !fullName) {
+      message.textContent = "Please enter your full name.";
+      return;
+    }
+
+    if (partnerType === "company" && !companyName) {
+      message.textContent = "Please enter your company name.";
+      return;
+    }
+
+    try {
+      const result = await callDeliveryService("register_partner", {
+        partner_type: partnerType,
+        full_name: fullName,
+        company_name: companyName,
+        business_registration_number:
+          document.getElementById("delivery-business-number").value.trim(),
+        email: document.getElementById("delivery-email").value.trim(),
+        phone: document.getElementById("delivery-phone").value.trim(),
+        country: document.getElementById("delivery-country").value.trim(),
+        region: document.getElementById("delivery-region").value.trim(),
+        district: document.getElementById("delivery-district").value.trim(),
+        street_address: document.getElementById("delivery-address").value.trim(),
+        vehicle_type: document.getElementById("delivery-vehicle").value,
+        vehicle_registration:
+          document.getElementById("delivery-vehicle-registration").value.trim()
+      });
+
+      message.textContent =
+        result.message || "Your application was submitted successfully.";
+
+      form.reset();
+      document.getElementById("delivery-country").value = "Ghana";
+
+    } catch (error) {
+      console.error("Delivery registration error:", error);
+      message.textContent =
+        error.message || "Could not submit your application. Please sign in and try again.";
+    }
+  });
+
+  // LOAD DELIVERY PARTNER DASHBOARD
+  dashboardButton.addEventListener("click", async function () {
+    dashboardResults.textContent = "Loading your delivery dashboard...";
+
+    try {
+      const result = await callDeliveryService("get_partner_dashboard");
+
+      dashboardResults.replaceChildren();
+
+      if (!result.registered) {
+        dashboardResults.textContent =
+          "You have not registered as a delivery partner yet.";
+        return;
+      }
+
+      const partnerHeading = document.createElement("h4");
+      partnerHeading.textContent =
+        "Application status: " + result.partner.status;
+      dashboardResults.appendChild(partnerHeading);
+
+      const summary = result.summary || {};
+
+      const summaryText = document.createElement("p");
+      summaryText.textContent =
+        "Total deliveries: " + summary.total_deliveries +
+        " | Completed: " + summary.completed_deliveries +
+        " | Available earnings: " +
+        Number(summary.available_earnings || 0).toFixed(2) +
+        " GHS | Total paid: " +
+        Number(summary.total_paid || 0).toFixed(2) + " GHS";
+
+      dashboardResults.appendChild(summaryText);
+
+      const shipmentHeading = document.createElement("h4");
+      shipmentHeading.textContent = "My Assigned Deliveries";
+      dashboardResults.appendChild(shipmentHeading);
+
+      if (!result.shipments || result.shipments.length === 0) {
+        const empty = document.createElement("p");
+        empty.textContent = "No deliveries assigned yet.";
+        dashboardResults.appendChild(empty);
+      } else {
+        result.shipments.forEach(function (shipment) {
+          const item = document.createElement("div");
+
+          const details = document.createElement("p");
+          details.textContent =
+            "Tracking number: " + (shipment.tracking_number || "Not available") +
+            " | Status: " + shipment.status +
+            " | Destination: " +
+            (shipment.destination_city || "") + ", " +
+            (shipment.destination_country || "");
+
+          const date = document.createElement("p");
+          date.textContent = "Created: " +
+            (shipment.created_at
+              ? new Date(shipment.created_at).toLocaleString("en-GH", {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                  timeZone: "Africa/Accra"
+                })
+              : "Not available");
+
+          item.append(details, date);
+          dashboardResults.appendChild(item);
+        });
+      }
+
+      const earningsHeading = document.createElement("h4");
+      earningsHeading.textContent = "My Earnings";
+      dashboardResults.appendChild(earningsHeading);
+
+      if (!result.earnings || result.earnings.length === 0) {
+        const emptyEarnings = document.createElement("p");
+        emptyEarnings.textContent = "No delivery earnings recorded yet.";
+        dashboardResults.appendChild(emptyEarnings);
+      } else {
+        result.earnings.forEach(function (earning) {
+          const item = document.createElement("p");
+          item.textContent =
+            Number(earning.partner_earning || 0).toFixed(2) +
+            " " + earning.currency + " — " + earning.status;
+          dashboardResults.appendChild(item);
+        });
+      }
+
+    } catch (error) {
+      console.error("Delivery dashboard error:", error);
+      dashboardResults.textContent =
+        error.message || "Could not load your delivery dashboard. Please sign in and try again.";
+    }
+  });
+});
+</script>
+
 </body>
 </html>

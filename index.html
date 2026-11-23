@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html>s
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -224,6 +224,10 @@ nav a{margin-left:8px}
 
       <label>Business name
         <input id="register-business" type="text" required>
+      </label>
+
+      <label>Country
+        <input id="register-country" type="text" value="Ghana" required>
       </label>
 
       <label>Email address
@@ -526,7 +530,99 @@ nav a{margin-left:8px}
   <h3>Submitted Products</h3>
   <div id="admin-products">Loading products...</div>
 </section>
-  <section id="contact">
+  
+<section id="delivery-partner-section" class="seller">
+  <p class="gold">DELIVERY NETWORK</p>
+  <h2>Become a GlobalMart Delivery Partner</h2>
+  <p>Register as an individual rider or a delivery company. Applications are reviewed before approval.</p>
+
+  <form id="delivery-partner-form" class="seller-form">
+    <label>Partner type
+      <select id="delivery-partner-type" required>
+        <option value="">Select partner type</option>
+        <option value="individual">Individual Rider</option>
+        <option value="company">Delivery Company</option>
+      </select>
+    </label>
+    <label>Full name (individual riders)
+      <input id="delivery-full-name" type="text" placeholder="Full name">
+    </label>
+    <label>Company name (companies)
+      <input id="delivery-company-name" type="text" placeholder="Company name">
+    </label>
+    <label>Business registration number (if applicable)
+      <input id="delivery-business-number" type="text">
+    </label>
+    <label>Email address
+      <input id="delivery-email" type="email" placeholder="Email address">
+    </label>
+    <label>Phone number
+      <input id="delivery-phone" type="tel" required placeholder="Phone number">
+    </label>
+    <label>Country
+      <input id="delivery-country" type="text" value="Ghana" required>
+    </label>
+    <label>Region
+      <input id="delivery-region" type="text" placeholder="Region">
+    </label>
+    <label>District
+      <input id="delivery-district" type="text" placeholder="District">
+    </label>
+    <label>Street address
+      <input id="delivery-address" type="text" placeholder="Street address">
+    </label>
+    <label>Vehicle type
+      <select id="delivery-vehicle">
+        <option value="">Select vehicle</option>
+        <option value="Motorcycle">Motorcycle</option>
+        <option value="Car">Car</option>
+        <option value="Van">Van</option>
+        <option value="Truck">Truck</option>
+        <option value="Other">Other</option>
+      </select>
+    </label>
+    <label>Vehicle registration number
+      <input id="delivery-vehicle-registration" type="text">
+    </label>
+    <button class="btn" type="submit">Submit Delivery Partner Application</button>
+  </form>
+  <p id="delivery-partner-message" class="form-note" aria-live="polite"></p>
+
+  <div id="delivery-partner-dashboard" class="seller-form">
+    <h3>My Delivery Dashboard</h3>
+    <button class="btn" type="button" id="load-delivery-dashboard">Load My Dashboard</button>
+    <div id="delivery-dashboard-results"></div>
+
+    <hr>
+    <h3>Request My Earnings</h3>
+    <p>Request any amount up to your available balance. Payout requests are subject to admin review.</p>
+    <form id="delivery-payout-form" class="seller-form">
+      <label>Amount to withdraw (GHS)
+        <input id="delivery-payout-amount" type="number" min="0.01" step="0.01" required placeholder="Enter amount">
+      </label>
+      <label>Payment method
+        <select id="delivery-payout-method" required>
+          <option value="">Select payment method</option>
+          <option value="mobile_money">Mobile Money</option>
+          <option value="bank">Bank Transfer</option>
+        </select>
+      </label>
+      <label>Account holder name
+        <input id="delivery-payout-name" type="text" required>
+      </label>
+      <label>Bank or Mobile Money provider
+        <input id="delivery-payout-provider" type="text" required placeholder="Example: MTN, Telecel, GCB">
+      </label>
+      <label>Last four digits of account number
+        <input id="delivery-payout-last4" type="text" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" required placeholder="Last 4 digits">
+      </label>
+      <button class="btn" type="submit">Submit Payout Request</button>
+    </form>
+    <p id="delivery-payout-message" class="form-note" aria-live="polite"></p>
+  </div>
+</section>
+
+<section id="contact">
 <h2>Contact GlobalMart</h2>
 <p>For customer enquiries, seller interest and business partnerships, contact us:</p>
 <p><a href="mailto:prosperfirm61@gmail.com">Email GlobalMart</a></p>
@@ -552,27 +648,16 @@ const db = window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_PUBLISHABLE_KEY
 );
-  
+
 async function callDeliveryService(action, payload = {}) {
-  const { data, error } = await db.functions.invoke(
-    "delivery-service",
-    {
-      body: {
-        action,
-        ...payload
-      }
-    }
-  );
+  const { data, error } = await db.functions.invoke("delivery-service", {
+    body: { action, ...payload }
+  });
 
   if (error) throw error;
-
-  if (data && data.error) {
-    throw new Error(data.error);
-  }
-
+  if (data && data.error) throw new Error(data.error);
   return data;
 }
-
 const registerMessage = document.getElementById("register-message");
 const loginMessage = document.getElementById("login-message");
 const logoutButton = document.getElementById("logout-button");
@@ -831,30 +916,8 @@ if (!customerProfile) {
       "Total: " + order.currency + " " +
       Number(order.total_amount).toFixed(2);
 
-const placed = document.createElement("p");
-placed.textContent = "Order placed: " + (
-  order.created_at
-    ? new Date(order.created_at).toLocaleString("en-GH", {
-        dateStyle: "medium",
-        timeStyle: "short",
-        timeZone: "Africa/Accra"
-      })
-    : "Not available"
-);
-
-const delivered = document.createElement("p");
-delivered.textContent = "Delivered: " + (
-  order.delivered_at
-    ? new Date(order.delivered_at).toLocaleString("en-GH", {
-        dateStyle: "medium",
-        timeStyle: "short",
-        timeZone: "Africa/Accra"
-      })
-    : "Not delivered yet"
-);
-
-item.append(heading, placed, delivered, status, payment, total);
-    if (
+    item.append(heading, status, payment, total);
+        if (
       order.delivery_status === "delivered" &&
       !order.customer_confirmed_at
     ) {
@@ -886,8 +949,8 @@ item.append(heading, placed, delivered, status, payment, total);
           confirmButton.textContent = "Confirm Package Received";
           return;
         }
-       
-        // Release delivery partner earnings after customer confirmation.
+
+        // Release delivery partner earnings only after the customer confirms receipt.
         const { data: shipment, error: shipmentLookupError } = await db
           .from("delivery_shipments")
           .select("id")
@@ -897,29 +960,21 @@ item.append(heading, placed, delivered, status, payment, total);
         if (shipmentLookupError) {
           alert("Your order is confirmed, but delivery earnings could not be updated. Please contact GlobalMart support.");
           console.error(shipmentLookupError);
-          await loadCustomerDashboard();
-          return;
-        }
-
-        if (shipment) {
+        } else if (shipment) {
           const { data: deliveryResult, error: deliveryError } =
             await db.rpc("confirm_delivery_receipt", {
               p_shipment_id: shipment.id
             });
 
           if (deliveryError || !deliveryResult?.success) {
-            alert(
-              "Your order is confirmed, but delivery earnings could not be released. Please contact GlobalMart support."
-            );
+            alert("Your order is confirmed, but delivery earnings could not be released. Please contact GlobalMart support.");
             console.error(deliveryError || deliveryResult);
-            await loadCustomerDashboard();
-            return;
           }
         }
 
         alert("Thank you! Your package receipt is confirmed.");
-
-        await loadCustomerDashboard();
+        const { data: refreshedSession } = await db.auth.getSession();
+        await loadCustomerDashboard(refreshedSession.session);
       });
 
       item.appendChild(confirmButton);
@@ -1048,29 +1103,8 @@ document.getElementById("seller-payout-balance").textContent =
       "Your Earnings: GHS " +
       Number(order.seller_earnings).toFixed(2);
 
-const placed = document.createElement("p");
-placed.textContent = "Order placed: " + (
-  order.created_at
-    ? new Date(order.created_at).toLocaleString("en-GH", {
-        dateStyle: "medium",
-        timeStyle: "short",
-        timeZone: "Africa/Accra"
-      })
-    : "Not available"
-);
+    item.append(heading, customer, status, earnings);
 
-const delivered = document.createElement("p");
-delivered.textContent = "Delivered: " + (
-  order.delivered_at
-    ? new Date(order.delivered_at).toLocaleString("en-GH", {
-        dateStyle: "medium",
-        timeStyle: "short",
-        timeZone: "Africa/Accra"
-      })
-    : "Not delivered yet"
-);
-
-item.append(heading, customer, placed, delivered, status, earnings);
        order.items.forEach(product => {
       const detail = document.createElement("p");
       detail.textContent =
@@ -1456,15 +1490,15 @@ async function loadPublicProducts() {
     category.className = "gold";
     category.textContent = product.category || "Uncategorized";
 
+    const premiumBadge = document.createElement("span");
+    premiumBadge.className = "premium-badge";
+    premiumBadge.textContent = "★ PREMIUM SELLER";
+
     const name = document.createElement("h3");
     name.textContent = product.name;
 
     const description = document.createElement("p");
     description.textContent = product.description || "";
-
-    const premiumBadge = document.createElement("span");
-    premiumBadge.className = "premium-badge";
-    premiumBadge.textContent = "★ PREMIUM SELLER";
 
     const price = document.createElement("p");
     price.textContent =
@@ -1524,7 +1558,6 @@ document.getElementById("market-country-filter")
 
 document.getElementById("country-filter")
   .addEventListener("change", loadPublicProducts);
-
 async function loadMyProducts() {
   const { data, error } = await db
     .from("products")
@@ -1564,8 +1597,6 @@ async function loadMyProducts() {
     container.appendChild(item);
   });
 }
-
-loadPublicProducts();
 
 document.getElementById("add-product-button")
   .addEventListener("click", async () => {
@@ -2049,71 +2080,6 @@ items: cart.map(item => ({
 
 </script>
 
-<section id="delivery-partner-section">
-  <h2>GlobalMart Delivery Partner</h2>
-  <p>Register as an individual delivery rider or a delivery company.</p>
-
-  <form id="delivery-partner-form">
-    <label>Partner type</label>
-    <select id="delivery-partner-type" required>
-      <option value="">Select partner type</option>
-      <option value="individual">Individual Rider</option>
-      <option value="company">Delivery Company</option>
-    </select>
-
-    <label>Full name (for individual riders)</label>
-    <input id="delivery-full-name" type="text" placeholder="Full name">
-
-    <label>Company name (for companies)</label>
-    <input id="delivery-company-name" type="text" placeholder="Company name">
-
-    <label>Business registration number (if applicable)</label>
-    <input id="delivery-business-number" type="text">
-
-    <label>Email address</label>
-    <input id="delivery-email" type="email" placeholder="Email address">
-
-    <label>Phone number</label>
-    <input id="delivery-phone" type="tel" required placeholder="Phone number">
-
-    <label>Country</label>
-    <input id="delivery-country" type="text" value="Ghana" required>
-
-    <label>Region</label>
-    <input id="delivery-region" type="text" placeholder="Region">
-
-    <label>District</label>
-    <input id="delivery-district" type="text" placeholder="District">
-
-    <label>Street address</label>
-    <input id="delivery-address" type="text" placeholder="Street address">
-
-    <label>Vehicle type</label>
-    <select id="delivery-vehicle">
-      <option value="">Select vehicle</option>
-      <option value="Motorcycle">Motorcycle</option>
-      <option value="Car">Car</option>
-      <option value="Van">Van</option>
-      <option value="Truck">Truck</option>
-      <option value="Other">Other</option>
-    </select>
-
-    <label>Vehicle registration number</label>
-    <input id="delivery-vehicle-registration" type="text">
-
-    <button type="submit">Submit Delivery Partner Application</button>
-  </form>
-
-  <p id="delivery-partner-message"></p>
-
-  <div id="delivery-partner-dashboard">
-    <h3>My Delivery Dashboard</h3>
-    <button type="button" id="load-delivery-dashboard">
-      Load My Dashboard
-    </button>
-    <div id="delivery-dashboard-results"></div>
-  </div>
-</section>
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
@@ -2121,15 +2087,14 @@ document.addEventListener("DOMContentLoaded", function () {
   const message = document.getElementById("delivery-partner-message");
   const dashboardButton = document.getElementById("load-delivery-dashboard");
   const dashboardResults = document.getElementById("delivery-dashboard-results");
+  const payoutForm = document.getElementById("delivery-payout-form");
+  const payoutMessage = document.getElementById("delivery-payout-message");
 
-  if (!form || !message || !dashboardButton || !dashboardResults) {
-    return;
-  }
+  if (!form || !message || !dashboardButton || !dashboardResults ||
+      !payoutForm || !payoutMessage) return;
 
-  // SUBMIT DELIVERY PARTNER APPLICATION
   form.addEventListener("submit", async function (event) {
     event.preventDefault();
-
     message.textContent = "Submitting your application...";
 
     const partnerType = document.getElementById("delivery-partner-type").value;
@@ -2140,7 +2105,6 @@ document.addEventListener("DOMContentLoaded", function () {
       message.textContent = "Please enter your full name.";
       return;
     }
-
     if (partnerType === "company" && !companyName) {
       message.textContent = "Please enter your company name.";
       return;
@@ -2151,8 +2115,7 @@ document.addEventListener("DOMContentLoaded", function () {
         partner_type: partnerType,
         full_name: fullName,
         company_name: companyName,
-        business_registration_number:
-          document.getElementById("delivery-business-number").value.trim(),
+        business_registration_number: document.getElementById("delivery-business-number").value.trim(),
         email: document.getElementById("delivery-email").value.trim(),
         phone: document.getElementById("delivery-phone").value.trim(),
         country: document.getElementById("delivery-country").value.trim(),
@@ -2160,54 +2123,40 @@ document.addEventListener("DOMContentLoaded", function () {
         district: document.getElementById("delivery-district").value.trim(),
         street_address: document.getElementById("delivery-address").value.trim(),
         vehicle_type: document.getElementById("delivery-vehicle").value,
-        vehicle_registration:
-          document.getElementById("delivery-vehicle-registration").value.trim()
+        vehicle_registration: document.getElementById("delivery-vehicle-registration").value.trim()
       });
 
-      message.textContent =
-        result.message || "Your application was submitted successfully.";
-
+      message.textContent = result.message || "Your application was submitted successfully.";
       form.reset();
       document.getElementById("delivery-country").value = "Ghana";
-
     } catch (error) {
       console.error("Delivery registration error:", error);
-      message.textContent =
-        error.message || "Could not submit your application. Please sign in and try again.";
+      message.textContent = error.message || "Could not submit your application. Please sign in and try again.";
     }
   });
 
-  // LOAD DELIVERY PARTNER DASHBOARD
   dashboardButton.addEventListener("click", async function () {
     dashboardResults.textContent = "Loading your delivery dashboard...";
-
     try {
       const result = await callDeliveryService("get_partner_dashboard");
-
       dashboardResults.replaceChildren();
 
       if (!result.registered) {
-        dashboardResults.textContent =
-          "You have not registered as a delivery partner yet.";
+        dashboardResults.textContent = "You have not registered as a delivery partner yet.";
         return;
       }
 
-      const partnerHeading = document.createElement("h4");
-      partnerHeading.textContent =
-        "Application status: " + result.partner.status;
-      dashboardResults.appendChild(partnerHeading);
+      const heading = document.createElement("h4");
+      heading.textContent = "Application status: " + result.partner.status;
+      dashboardResults.appendChild(heading);
 
       const summary = result.summary || {};
-
       const summaryText = document.createElement("p");
       summaryText.textContent =
-        "Total deliveries: " + summary.total_deliveries +
-        " | Completed: " + summary.completed_deliveries +
-        " | Available earnings: " +
-        Number(summary.available_earnings || 0).toFixed(2) +
-        " GHS | Total paid: " +
-        Number(summary.total_paid || 0).toFixed(2) + " GHS";
-
+        "Total deliveries: " + Number(summary.total_deliveries || 0) +
+        " | Completed: " + Number(summary.completed_deliveries || 0) +
+        " | Available earnings: GHS " + Number(summary.available_earnings || 0).toFixed(2) +
+        " | Total paid: GHS " + Number(summary.total_paid || 0).toFixed(2);
       dashboardResults.appendChild(summaryText);
 
       const shipmentHeading = document.createElement("h4");
@@ -2221,25 +2170,19 @@ document.addEventListener("DOMContentLoaded", function () {
       } else {
         result.shipments.forEach(function (shipment) {
           const item = document.createElement("div");
-
+          item.className = "category";
           const details = document.createElement("p");
           details.textContent =
             "Tracking number: " + (shipment.tracking_number || "Not available") +
             " | Status: " + shipment.status +
-            " | Destination: " +
-            (shipment.destination_city || "") + ", " +
-            (shipment.destination_country || "");
-
+            " | Destination: " + (shipment.destination_city || "") +
+            ", " + (shipment.destination_country || "");
           const date = document.createElement("p");
-          date.textContent = "Created: " +
-            (shipment.created_at
-              ? new Date(shipment.created_at).toLocaleString("en-GH", {
-                  dateStyle: "medium",
-                  timeStyle: "short",
-                  timeZone: "Africa/Accra"
-                })
-              : "Not available");
-
+          date.textContent = "Created: " + (shipment.created_at
+            ? new Date(shipment.created_at).toLocaleString("en-GH", {
+                dateStyle: "medium", timeStyle: "short", timeZone: "Africa/Accra"
+              })
+            : "Not available");
           item.append(details, date);
           dashboardResults.appendChild(item);
         });
@@ -2250,23 +2193,89 @@ document.addEventListener("DOMContentLoaded", function () {
       dashboardResults.appendChild(earningsHeading);
 
       if (!result.earnings || result.earnings.length === 0) {
-        const emptyEarnings = document.createElement("p");
-        emptyEarnings.textContent = "No delivery earnings recorded yet.";
-        dashboardResults.appendChild(emptyEarnings);
+        const empty = document.createElement("p");
+        empty.textContent = "No delivery earnings recorded yet.";
+        dashboardResults.appendChild(empty);
       } else {
         result.earnings.forEach(function (earning) {
           const item = document.createElement("p");
           item.textContent =
             Number(earning.partner_earning || 0).toFixed(2) +
-            " " + earning.currency + " — " + earning.status;
+            " " + (earning.currency || "GHS") + " — " + earning.status;
           dashboardResults.appendChild(item);
         });
       }
 
+      const payoutsHeading = document.createElement("h4");
+      payoutsHeading.textContent = "My Payout Requests";
+      dashboardResults.appendChild(payoutsHeading);
+      if (!result.payouts || result.payouts.length === 0) {
+        const empty = document.createElement("p");
+        empty.textContent = "No payout requests yet.";
+        dashboardResults.appendChild(empty);
+      } else {
+        result.payouts.forEach(function (payout) {
+          const item = document.createElement("p");
+          item.textContent =
+            "GHS " + Number(payout.amount || 0).toFixed(2) +
+            " — " + payout.status + " — " +
+            (payout.requested_at
+              ? new Date(payout.requested_at).toLocaleString("en-GH", {
+                  dateStyle: "medium", timeStyle: "short", timeZone: "Africa/Accra"
+                })
+              : "Date unavailable");
+          dashboardResults.appendChild(item);
+        });
+      }
     } catch (error) {
       console.error("Delivery dashboard error:", error);
       dashboardResults.textContent =
         error.message || "Could not load your delivery dashboard. Please sign in and try again.";
+    }
+  });
+
+  payoutForm.addEventListener("submit", async function (event) {
+    event.preventDefault();
+    const amount = Number(document.getElementById("delivery-payout-amount").value);
+    const method = document.getElementById("delivery-payout-method").value;
+    const accountName = document.getElementById("delivery-payout-name").value.trim();
+    const provider = document.getElementById("delivery-payout-provider").value.trim();
+    const last4 = document.getElementById("delivery-payout-last4").value.trim();
+
+    if (!Number.isFinite(amount) || amount <= 0 || !method ||
+        !accountName || !provider || !/^[0-9]{4}$/.test(last4)) {
+      payoutMessage.textContent = "Please complete all payout details correctly.";
+      return;
+    }
+
+    const submitButton = payoutForm.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    submitButton.textContent = "Submitting...";
+    payoutMessage.textContent = "";
+
+    try {
+      const { data, error } = await db.rpc("request_delivery_payout", {
+        p_amount: amount,
+        p_payout_method: method,
+        p_account_name: accountName,
+        p_provider: provider,
+        p_account_last4: last4
+      });
+      if (error) throw error;
+      if (!data || !data.success) {
+        throw new Error(data?.error || "Could not submit payout request.");
+      }
+
+      payoutMessage.textContent =
+        "Your payout request has been submitted for admin review. Status: Pending.";
+      document.getElementById("delivery-payout-amount").value = "";
+      await dashboardButton.click();
+    } catch (error) {
+      console.error("Delivery payout error:", error);
+      payoutMessage.textContent = error.message || "Could not submit payout request.";
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = "Submit Payout Request";
     }
   });
 });

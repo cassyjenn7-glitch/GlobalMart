@@ -552,6 +552,27 @@ const db = window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_PUBLISHABLE_KEY
 );
+  
+async function callDeliveryService(action, payload = {}) {
+  const { data, error } = await db.functions.invoke(
+    "delivery-service",
+    {
+      body: {
+        action,
+        ...payload
+      }
+    }
+  );
+
+  if (error) throw error;
+
+  if (data && data.error) {
+    throw new Error(data.error);
+  }
+
+  return data;
+}
+
 const registerMessage = document.getElementById("register-message");
 const loginMessage = document.getElementById("login-message");
 const logoutButton = document.getElementById("logout-button");

@@ -2019,5 +2019,71 @@ items: cart.map(item => ({
 
 </script>
 
+<section id="delivery-partner-section">
+  <h2>GlobalMart Delivery Partner</h2>
+  <p>Register as an individual delivery rider or a delivery company.</p>
+
+  <form id="delivery-partner-form">
+    <label>Partner type</label>
+    <select id="delivery-partner-type" required>
+      <option value="">Select partner type</option>
+      <option value="individual">Individual Rider</option>
+      <option value="company">Delivery Company</option>
+    </select>
+
+    <label>Full name (for individual riders)</label>
+    <input id="delivery-full-name" type="text" placeholder="Full name">
+
+    <label>Company name (for companies)</label>
+    <input id="delivery-company-name" type="text" placeholder="Company name">
+
+    <label>Business registration number (if applicable)</label>
+    <input id="delivery-business-number" type="text">
+
+    <label>Email address</label>
+    <input id="delivery-email" type="email" placeholder="Email address">
+
+    <label>Phone number</label>
+    <input id="delivery-phone" type="tel" required placeholder="Phone number">
+
+    <label>Country</label>
+    <input id="delivery-country" type="text" value="Ghana" required>
+
+    <label>Region</label>
+    <input id="delivery-region" type="text" placeholder="Region">
+
+    <label>District</label>
+    <input id="delivery-district" type="text" placeholder="District">
+
+    <label>Street address</label>
+    <input id="delivery-address" type="text" placeholder="Street address">
+
+    <label>Vehicle type</label>
+    <select id="delivery-vehicle">
+      <option value="">Select vehicle</option>
+      <option value="Motorcycle">Motorcycle</option>
+      <option value="Car">Car</option>
+      <option value="Van">Van</option>
+      <option value="Truck">Truck</option>
+      <option value="Other">Other</option>
+    </select>
+
+    <label>Vehicle registration number</label>
+    <input id="delivery-vehicle-registration" type="text">
+
+    <button type="submit">Submit Delivery Partner Application</button>
+  </form>
+
+  <p id="delivery-partner-message"></p>
+
+  <div id="delivery-partner-dashboard">
+    <h3>My Delivery Dashboard</h3>
+    <button type="button" id="load-delivery-dashboard">
+      Load My Dashboard
+    </button>
+    <div id="delivery-dashboard-results"></div>
+  </div>
+</section>
+
 </body>
 </html>

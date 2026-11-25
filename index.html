@@ -727,9 +727,18 @@ const db = window.supabase.createClient(
   SUPABASE_PUBLISHABLE_KEY
 );
 
+
 async function callDeliveryService(action, payload = {}) {
   const { data, error } = await db.functions.invoke("delivery-service", {
-    async function callGiftCardPayout(orderId) {
+    body: { action, ...payload }
+  });
+
+  if (error) throw error;
+  if (data && data.error) throw new Error(data.error);
+  return data;
+}
+
+async function callGiftCardPayout(orderId) {
   const { data, error } = await db.functions.invoke(
     "gm-process-gift-card-payout",
     {
@@ -739,16 +748,9 @@ async function callDeliveryService(action, payload = {}) {
 
   if (error) throw error;
   if (data && data.error) throw new Error(data.error);
-
   return data;
 }
-    body: { action, ...payload }
-  });
 
-  if (error) throw error;
-  if (data && data.error) throw new Error(data.error);
-  return data;
-}
 const registerMessage = document.getElementById("register-message");
 const loginMessage = document.getElementById("login-message");
 const logoutButton = document.getElementById("logout-button");

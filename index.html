@@ -1868,11 +1868,14 @@ db.auth.onAuthStateChange((event, session) => {
   }, 0);
 });
 
-db.auth.getSession().then(({ data: { session } }) => {
+  db.auth.getSession().then(({ data: { session } }) => {
   loadSellerDashboard(session);
   loadCustomerDashboard(session);
   loadAdminDashboard(session);
 });
+</script>
+<style>
+  
   <style>
 /* GLOBALMART MONEY CENTER */
 .money-center {

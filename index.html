@@ -1,4 +1,4 @@
-<!DOCTYPE html>s
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -55,6 +55,7 @@ nav a{margin-left:8px}
 <nav>
 <a href="#categories">Categories</a>
 <a href="#products">Discover</a>
+  <a href="#money-center">Money Center</a>
 <a href="#sellers">Become a Seller</a>
   <a href="#customers">Customer Account</a>
 <a href="#contact">Contact</a>
@@ -620,6 +621,83 @@ nav a{margin-left:8px}
     </form>
     <p id="delivery-payout-message" class="form-note" aria-live="polite"></p>
   </div>
+</section>
+
+<!-- GLOBALMART MONEY CENTER -->
+
+<section id="money-center" class="money-center">
+
+  <p class="gold">GLOBALMART FINANCIAL SERVICES</p>
+
+  <h2>GlobalMart Money Center</h2>
+
+  <p>
+    One destination for gift cards, digital assets
+    and convenient payment services.
+  </p>
+
+  <div class="money-grid">
+
+    <!-- GIFT CARD MARKETPLACE -->
+
+    <div class="money-card" id="gift-cards">
+
+      <div class="money-icon">🎁</div>
+
+      <h3>Gift Card Marketplace</h3>
+
+      <p>
+        Discover and purchase gift cards from GlobalMart
+        and approved independent businesses.
+      </p>
+
+      <ul>
+        <li>Buy gift cards for yourself</li>
+        <li>Send gifts to friends and family</li>
+        <li>Explore international gift cards</li>
+        <li>Approved independent gift card sellers</li>
+      </ul>
+
+      <p class="money-status">
+        MARKETPLACE DEVELOPMENT IN PROGRESS
+      </p>
+
+    </div>
+
+    <!-- CRYPTO AND DIGITAL ASSETS -->
+
+    <div class="money-card" id="crypto-assets">
+
+      <div class="money-icon">₿</div>
+
+      <h3>GlobalMart Crypto & Digital Assets</h3>
+
+      <p>
+        Your digital asset hub within GlobalMart Money Center.
+      </p>
+
+      <ul>
+        <li>Buy Bitcoin</li>
+        <li>Sell Bitcoin</li>
+        <li>Send and receive Bitcoin</li>
+        <li>Pay participating GlobalMart merchants</li>
+        <li>View digital asset transaction history</li>
+      </ul>
+
+      <p class="money-status">
+        PROVIDER INTEGRATION AND COMPLIANCE PENDING
+      </p>
+
+    </div>
+
+  </div>
+
+  <p class="muted">
+    Digital asset services will become available only after
+    the necessary provider integrations, security and
+    regulatory requirements are satisfied.
+  </p>
+
 </section>
 
 <section id="contact">
@@ -1780,6 +1858,48 @@ db.auth.getSession().then(({ data: { session } }) => {
   loadCustomerDashboard(session);
   loadAdminDashboard(session);
 });
+  
+/* GLOBALMART MONEY CENTER */
+.money-center {
+  background: linear-gradient(135deg, #111, #211a0e);
+  border-top: 1px solid #66502a;
+}
+
+.money-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 22px;
+  margin-top: 30px;
+}
+
+.money-card {
+  background: #171717;
+  border: 1px solid #66502a;
+  padding: 28px;
+  border-radius: 8px;
+}
+
+.money-icon {
+  font-size: 42px;
+  color: #d7b56d;
+}
+
+.money-card h3 {
+  color: #d7b56d;
+}
+
+.money-status {
+  color: #d7b56d;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+@media(max-width:700px) {
+  .money-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 </script>
 
 <!-- GLOBALMART ALEX AI CHAT ASSISTANT -->

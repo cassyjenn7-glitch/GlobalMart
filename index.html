@@ -754,6 +754,97 @@ async function callGiftCardPayout(orderId) {
     }
   );
 
+// GLOBALMART: LOAD APPROVED GIFT CARDS
+
+async function loadPublicGiftCards() {
+  const container = document.getElementById("public-gift-cards");
+
+  container.textContent = "Loading available gift cards...";
+
+  const { data, error } = await db
+    .from("gm_gift_cards")
+    .select(`
+      id,
+      card_name,
+      brand_name,
+      description,
+      image_url,
+      face_value,
+      selling_price,
+      currency,
+      issuer_country,
+      delivery_type
+    `)
+    .eq("listing_status", "approved")
+    .order("created_at", { ascending: false });
+
+  container.replaceChildren();
+
+  if (error) {
+    container.textContent = "Gift cards could not be loaded. Please try again.";
+    console.error("Gift card loading error:", error);
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    container.textContent = "No approved gift cards are available yet.";
+    return;
+  }
+
+  data.forEach(card => {
+    const item = document.createElement("div");
+    item.className = "money-card";
+
+    if (card.image_url) {
+      const image = document.createElement("img");
+      image.src = card.image_url;
+      image.alt = card.card_name;
+      image.style.width = "100%";
+      image.style.maxHeight = "160px";
+      image.style.objectFit = "contain";
+      item.appendChild(image);
+    }
+
+    const name = document.createElement("h3");
+    name.textContent = card.card_name;
+
+    const brand = document.createElement("p");
+    brand.textContent = "Brand: " + (card.brand_name || "Not specified");
+
+    const price = document.createElement("p");
+    price.textContent =
+      "Selling price: " + card.currency + " " +
+      Number(card.selling_price).toFixed(2);
+
+    const value = document.createElement("p");
+    value.textContent =
+      "Face value: " + card.currency + " " +
+      Number(card.face_value).toFixed(2);
+
+    const country = document.createElement("p");
+    country.textContent =
+      "Issuer country: " + (card.issuer_country || "Not specified");
+
+    const delivery = document.createElement("p");
+    delivery.textContent =
+      "Delivery: " + card.delivery_type;
+
+    item.append(name, brand, price, value, country, delivery);
+
+    if (card.description) {
+      const description = document.createElement("p");
+      description.textContent = card.description;
+      item.appendChild(description);
+    }
+
+    container.appendChild(item);
+  });
+}
+
+document
+  .getElementById("browse-gift-cards-button")
+  .addEventListener("click", loadPublicGiftCards);
+
   if (error) throw error;
   if (data && data.error) throw new Error(data.error);
   return data;

@@ -729,6 +729,19 @@ const db = window.supabase.createClient(
 
 async function callDeliveryService(action, payload = {}) {
   const { data, error } = await db.functions.invoke("delivery-service", {
+    async function callGiftCardPayout(orderId) {
+  const { data, error } = await db.functions.invoke(
+    "gm-process-gift-card-payout",
+    {
+      body: { order_id: orderId }
+    }
+  );
+
+  if (error) throw error;
+  if (data && data.error) throw new Error(data.error);
+
+  return data;
+}
     body: { action, ...payload }
   });
 
